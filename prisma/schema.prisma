@@ -1,0 +1,312 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleEnum {
+  SUPER @map("super")
+  ADMIN @map("admin")
+  RESTAURANT @map("restaurant")
+  USER @map("user")
+}
+
+model User {
+  id String @id @default(uuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email String @unique
+  firstName String
+  lastName String
+  hashedPassword String?
+  image String?
+  role RoleEnum @default(USER)
+
+  accounts Account?
+  restuarantsOwned RestaurantDetails[]
+}
+
+enum UserStatus {
+  ACTIVE @map("active")
+  INACTIVE @map("inactive")
+  SUSPENDED @map("suspended")
+}
+
+model Account {
+  id String @id @default(uuid())
+
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+
+  providerType String @default("local")
+  provider String @default("local")
+  providerAccountId String
+
+  refreshToken String?
+  accessToken String?
+  accessTokenExpires Int? // In minutes
+  tokenType String?
+
+  @@unique([provider, providerAccountId])
+}
+
+// Restaurant Details
+enum RestaurantStatus {
+  ACTIVE @map("active")
+  INACTIVE @map("inactive")
+  SUSPENDED @map("suspended")
+}
+
+model RestaurantDetails {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  status RestaurantStatus @default(ACTIVE)
+
+  // Restaurant Info
+  name String 
+  phone String
+  description String? 
+  website String?
+  image String?
+
+  // Location Data
+  address String
+
+  cityId String
+  city City @relation(fields: [cityId], references: [id])
+
+  stateId String
+  state State @relation(fields: [stateId], references: [id])
+
+  countryId String
+  country Country @relation(fields: [countryId], references: [id])
+
+  zip String
+  lat String?
+  lon String?
+
+  // Restaurant Media
+  images Media[]
+
+  // Owner Info
+  ownerId String
+  ownerUser User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  // Restaurant Orders
+  ordersPlaced RestaurantOrder[]
+
+  // Food Order List
+  foodOrders FoodOrder[]
+}
+
+model RestaurantOrder {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // Items Ordered
+  orderItems OrderItem[]
+
+  // Restaurant Ordering
+  restaurantId String
+  restaurant RestaurantDetails @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+model OrderItem {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  quantity Int
+
+  // Product Ordered
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // Placed Order
+  orderPlacedId String?
+  orderPlaced RestaurantOrder? @relation(fields: [orderPlacedId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id        String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // Product Info
+  name String // Name of the item
+  description String?
+  size Float? // Size of the item in oz, lbs, etc
+
+  rating Float @default(3.5) // 1-5 
+  tags String[]  // Tags for the food item such as Premium, Gluten Free, vegan, etc
+
+  // Logo
+  image Media[]
+
+  // For Restaurants Placing Orders
+  orderItems OrderItem[]
+
+  // For Restaurants Creating Order Record
+  foodOrderItems FoodOrderItem[]
+}
+
+//// Previous Orders Model 
+// Food Order Models
+model FoodOrder {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // Order Info
+  orderName String
+  dateOfOrder DateTime?
+  orderDescription String?
+  orderItems FoodOrderItem[]
+
+  // Distributor Info
+  distributor String
+  distributorId String?
+  distributorInfo Distributor? @relation(fields: [distributorId], references: [id])
+
+  // Order Restaurant
+  restaurantId String
+  restaurant RestaurantDetails @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+model FoodOrderItem {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // Order Info
+  productName String
+  productId String?
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  description String?
+  quantity Int
+  price Decimal
+
+  // Food Order
+  foodOrderId String
+  foodOrder FoodOrder @relation(fields: [foodOrderId], references: [id], onDelete: Cascade)
+}
+
+model Distributor {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // Distributor Info
+  name String
+  description String?
+  email String?
+  phone String?
+  website String?
+  
+  // Location Data
+  address String
+
+  cityId String
+  city City @relation(fields: [cityId], references: [id])
+
+  stateId String
+  state State @relation(fields: [stateId], references: [id])
+
+  countryId String
+  country Country @relation(fields: [countryId], references: [id])
+
+  zip String
+  lat String?
+  lon String?
+
+  // Distributor Media
+  images Media[]
+
+  // Distributor Food Orders
+  ordersFulfilled FoodOrder[]
+}
+
+// Location Models: Cities, States, Countries
+model City {
+  id String @id @default(uuid())
+  name String
+
+  stateId String
+  state State @relation(fields: [stateId], references: [id], onDelete: Cascade)
+
+  countryId String
+  country Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  restaurantDetails RestaurantDetails[]
+  distributor Distributor[]
+}
+
+model State {
+  id String @id @default(uuid())
+  name String
+  code String
+
+  city City[]
+
+  countryId String
+  country Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  restaurantDetails RestaurantDetails[]
+  distributor Distributor[]
+}
+
+model Country {
+  id String @id @default(uuid())
+  name String
+  code String
+
+  city City[]
+  state State[]
+
+  restaurantDetails RestaurantDetails[]
+  distributor Distributor[]
+}
+
+// Media Models
+model Media {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  fileName String
+  fileSize BigInt 
+  fileUrl String
+  fileType String
+
+  
+  // Restaurant Info
+  restaurantId String?
+  restaurant RestaurantDetails? @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  // Distributor Info
+  distributorId String?
+  distributor Distributor? @relation(fields: [distributorId], references: [id], onDelete: Cascade)
+
+  // Food Order Info
+  productId String?
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
