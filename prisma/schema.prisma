@@ -15,6 +15,8 @@ enum RoleEnum {
   ADMIN @map("admin")
   RESTAURANT @map("restaurant")
   USER @map("user")
+
+  @@map("roleEnum")
 }
 
 model User {
@@ -28,16 +30,20 @@ model User {
   lastName String
   hashedPassword String?
   image String?
-  role RoleEnum @default(USER)
+  role RoleEnum[] @default([USER])
 
   accounts Account?
   restuarantsOwned RestaurantDetails[]
+
+  @@map("user")
 }
 
 enum UserStatus {
   ACTIVE @map("active")
   INACTIVE @map("inactive")
   SUSPENDED @map("suspended")
+
+  @@map("userStatus")
 }
 
 model Account {
@@ -57,6 +63,7 @@ model Account {
   tokenType String?
 
   @@unique([provider, providerAccountId])
+  @@map("account")
 }
 
 // Restaurant Details
@@ -64,6 +71,8 @@ enum RestaurantStatus {
   ACTIVE @map("active")
   INACTIVE @map("inactive")
   SUSPENDED @map("suspended")
+
+  @@map("restaurantStatus")
 }
 
 model RestaurantDetails {
@@ -109,6 +118,8 @@ model RestaurantDetails {
 
   // Food Order List
   foodOrders FoodOrder[]
+
+  @@map("restaurantDetails")
 }
 
 model RestaurantOrder {
@@ -123,6 +134,8 @@ model RestaurantOrder {
   // Restaurant Ordering
   restaurantId String
   restaurant RestaurantDetails @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@map("restaurantOrder")
 }
 
 model OrderItem {
@@ -140,6 +153,8 @@ model OrderItem {
   // Placed Order
   orderPlacedId String?
   orderPlaced RestaurantOrder? @relation(fields: [orderPlacedId], references: [id], onDelete: Cascade)
+
+  @@map("orderItem")
 }
 
 model Product {
@@ -164,6 +179,8 @@ model Product {
 
   // For Restaurants Creating Order Record
   foodOrderItems FoodOrderItem[]
+
+  @@map("product")
 }
 
 //// Previous Orders Model 
@@ -188,6 +205,8 @@ model FoodOrder {
   // Order Restaurant
   restaurantId String
   restaurant RestaurantDetails @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@map("foodOrder")
 }
 
 model FoodOrderItem {
@@ -207,6 +226,8 @@ model FoodOrderItem {
   // Food Order
   foodOrderId String
   foodOrder FoodOrder @relation(fields: [foodOrderId], references: [id], onDelete: Cascade)
+
+  @@map("foodOrderItem")
 }
 
 model Distributor {
@@ -243,6 +264,8 @@ model Distributor {
 
   // Distributor Food Orders
   ordersFulfilled FoodOrder[]
+
+  @@map("distributor")
 }
 
 // Location Models: Cities, States, Countries
@@ -258,6 +281,8 @@ model City {
 
   restaurantDetails RestaurantDetails[]
   distributor Distributor[]
+
+  @@map("city")
 }
 
 model State {
@@ -272,6 +297,8 @@ model State {
 
   restaurantDetails RestaurantDetails[]
   distributor Distributor[]
+
+  @@map("state")
 }
 
 model Country {
@@ -284,6 +311,8 @@ model Country {
 
   restaurantDetails RestaurantDetails[]
   distributor Distributor[]
+
+  @@map("country")
 }
 
 // Media Models
@@ -309,4 +338,6 @@ model Media {
   // Food Order Info
   productId String?
   product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("media")
 }

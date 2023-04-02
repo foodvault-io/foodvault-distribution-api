@@ -7,8 +7,8 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { LocalAuthDto } from './dto';
-import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { Token, Tokens, OAuthUser } from './types';
 
@@ -223,7 +223,7 @@ export class AuthService {
         }
     }
 
-    async getTokens(userId: string, email: string, role: string): Promise<Tokens> {
+    async getTokens(userId: string, email: string, role: string[]): Promise<Tokens> {
         const [at, rt] = await Promise.all([
             this.jwtService.signAsync({
                 userId: userId,
@@ -252,7 +252,7 @@ export class AuthService {
 
     }
 
-    async getAccessToken(userId: string, email: string, role: string): Promise<Token> {
+    async getAccessToken(userId: string, email: string, role: string[]): Promise<Token> {
         const at = await this.jwtService.signAsync({
             userId: userId,
             email: email,

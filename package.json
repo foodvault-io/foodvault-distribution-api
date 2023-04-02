@@ -116,7 +116,9 @@
       "<rootDir>/auth/strategies/",
       "<rootDir>/auth/types/",
       "<rootDir>/auth/auth.module.ts",
-      "<rootDir>/users/users.module.ts"
+      "<rootDir>/users/users.module.ts",
+      "<rootDir>/users/dto/index.ts",
+      "<rootDir>/users/entities"
     ],
     "coveragePathIgnorePatterns": [
       "/dist/",
@@ -132,7 +134,10 @@
       "<rootDir>/auth/auth.module.ts",
       "<rootDir>/users/users.module.ts",
       "<rootDir>/users/dto/index.ts",
-      "<rootDir>/users/entities"
+      "<rootDir>/users/entities",
+      "<rootDir>/restaurants/restaurant.module.ts",
+      "<rootDir>/restaurants/entities",
+      "<rootDir>/restaurants/dto/index.ts"
     ],
     "reporters": [
       "default",
