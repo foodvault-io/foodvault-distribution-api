@@ -3,13 +3,15 @@ import {
     Controller,
     Post,
     UseGuards,
-    Get
+    Get,
+    HttpCode,
+    HttpStatus,
+    Logger
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthDto } from './dto';
 import { Login, SignUp, OpenAuthUser, Token } from './entities';
 import {
-    ApiHeaders,
     ApiOperation,
     ApiResponse,
     ApiTags,
@@ -36,9 +38,13 @@ import {
     version: '1',
 })
 export class AuthController {
+    logger: Logger;
+
     constructor(
         private readonly authService: AuthService,
-    ) { }
+    ) { 
+        this.logger = new Logger(AuthController.name);
+    }
 
     // Local SignUp
     @ApiOperation({ summary: 'Create User Using the Local Strategy' })
@@ -64,9 +70,9 @@ export class AuthController {
     @UseGuards(LocalAuthGuard)
     @Post('/local/login')
     signInLocally(
-        @UserFromOAuth() user: Tokens
+        @UserFromOAuth() tokens: Tokens
     ) {
-        return user;
+        return tokens;
     }
 
     // Google Controllers
@@ -79,7 +85,7 @@ export class AuthController {
     @UseGuards(GoogleAuthGuard)
     @Get('/google')
     async googleAuth() {
-        console.log('Google Auth Route Initiated')
+        this.logger.warn('Google Auth Route Initiated')
     }
 
     @ApiOperation({ summary: 'Google Strategy Callback Route' })
@@ -107,7 +113,7 @@ export class AuthController {
     @UseGuards(FacebookAuthGuard)
     @Get('/facebook')
     async facebookAuth() {
-        console.log('Facebook Auth Route Initiated')
+        this.logger.warn('Facebook Auth Route Initiated')
     }
 
     @ApiOperation({ summary: 'Facebook Strategy Callback Route' })
@@ -135,7 +141,7 @@ export class AuthController {
     @UseGuards(LinkedInAuthGuard)
     @Get('/linkedin')
     async linkedInAuth() {
-        console.log('LinkedIn Auth Route Initiated')
+        this.logger.warn('LinkedIn Auth Route Initiated')
     }
 
     @ApiOperation({ summary: 'LinkedIn Strategy Callback Route' })
@@ -159,19 +165,7 @@ export class AuthController {
         status: 200,
         description: 'User Logged Out',
     })
-    @ApiHeaders([
-        {
-            name: 'Authorization',
-            description: 'Access Bearer Token',
-            required: true,
-        },
-        {
-            name: 'Content-Type',
-            description: 'Content Type',
-            required: true,
-            example: 'application/json',
-        }
-    ])
+    @HttpCode(HttpStatus.NO_CONTENT)
     @Post('logout')
     logout(@GetCurrentUserId() userId: string) {
         return this.authService.localLogout(userId);
@@ -184,13 +178,6 @@ export class AuthController {
         description: 'Access Token Refreshed',
         type: Token,
     })
-    @ApiHeaders([
-        {
-            name: 'Authorization',
-            description: 'Refresh Bearer Token',
-            required: true,
-        },
-    ])
     @Public()
     @UseGuards(RtJwtGuard)
     @Post('/refresh')

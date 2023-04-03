@@ -156,17 +156,26 @@ export class AuthService {
 
     // Logout Methods:
     async localLogout(userId: string) {
-        await this.prisma.account.updateMany({
-            where: {
-                userId,
-                refreshToken: {
-                    not: null,
+        try {
+            await this.prisma.account.updateMany({
+                where: {
+                    userId,
+                    refreshToken: {
+                        not: null,
+                    },
                 },
-            },
-            data: {
-                refreshToken: null,
+                data: {
+                    refreshToken: null,
+                }
+            })
+
+            return {
+                status: 204,
+                message: 'Logged Out Successfully',
             }
-        })
+        } catch (err) {
+            throw err;
+        }
     }
 
 
@@ -228,7 +237,7 @@ export class AuthService {
             this.jwtService.signAsync({
                 userId: userId,
                 email: email,
-                role: role,
+                roles: role,
             }, {
                 secret: this.config.get('AT_JWT_SECRET_KEY'),
                 expiresIn: 60 * 15, // 15 minutes
@@ -237,7 +246,7 @@ export class AuthService {
             this.jwtService.signAsync({
                 userId: userId,
                 email: email,
-                role: role,
+                roles: role,
             }, {
                 secret: this.config.get('RT_JWT_SECRET_KEY'),
                 expiresIn: 60 * 60 * 24 * 7, // 7 days
@@ -256,7 +265,7 @@ export class AuthService {
         const at = await this.jwtService.signAsync({
             userId: userId,
             email: email,
-            role: role,
+            roles: role,
         }, {
             secret: this.config.get('AT_JWT_SECRET_KEY'),
             expiresIn: 60 * 15, // 15 minutes

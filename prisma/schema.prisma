@@ -11,7 +11,6 @@ datasource db {
 }
 
 enum RoleEnum {
-  SUPER @map("super")
   ADMIN @map("admin")
   RESTAURANT @map("restaurant")
   USER @map("user")
@@ -21,7 +20,6 @@ enum RoleEnum {
 
 model User {
   id String @id @default(uuid())
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

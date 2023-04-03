@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Patch, Param, Delete, NotFoundException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete, UseGuards, ForbiddenException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,7 +7,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Public } from '../common/decorators';
+import { GetCurrentUser, Public } from '../common/decorators';
+import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles, UserRoles } from 'nest-access-control';
+import { JwtPayload } from 'src/auth/types';
+
+const resource = 'user';
 
 @ApiTags('Users')
 @Controller({
@@ -15,7 +19,10 @@ import { Public } from '../common/decorators';
   version: '1',
 })
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(
+    private readonly usersService: UsersService,
+    @InjectRolesBuilder() private readonly roleBuilder: RolesBuilder,
+  ) { }
 
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({
@@ -36,18 +43,20 @@ export class UsersController {
     type: CreateUserDto,
   })
   @Get(':id')
-  async findOneById(@Param('id') id: string) {
-    const user = await this.usersService.findOneById(id);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (user.hashedPassword) {
-      delete user.hashedPassword;
-    }
-
-    return user;
+  @UseGuards(ACGuard)
+  async findOneById(
+    @Param('id') id: string,
+    @GetCurrentUser() user: JwtPayload,
+  ) {
+    if (this.roleBuilder.can(user.roles).readAny(resource).granted) {
+      return await this.usersService.findOneById(id);
+    } else {
+      if (user.userId === id) {
+        return await this.usersService.findOneById(id);
+      } else {
+        throw new ForbiddenException('You are not allowed to access this resource');
+      }
+    }  
   }
 
   @ApiOperation({ summary: 'Get a user by email' })
@@ -56,19 +65,21 @@ export class UsersController {
     description: 'User found',
     type: CreateUserDto,
   })
+  @UseGuards(ACGuard)
   @Get('/email/:email')
-  async findOneByEmail(@Param('email') email: string) {
-    const user = await this.usersService.findOneByEmail(email);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
+  async findOneByEmail(
+    @Param('email') email: string,
+    @GetCurrentUser() user: JwtPayload,
+  ) {
+    if (this.roleBuilder.can(user.roles).readAny(resource).granted) {
+      return await this.usersService.findOneByEmail(email);
+    } else {
+      if (user.email === email) {
+        return await this.usersService.findOneByEmail(email);
+      } else {
+        throw new ForbiddenException('You are not allowed to access this resource');
+      }
     }
-
-    if (user.hashedPassword) {
-      delete user.hashedPassword;
-    }
-
-    return user;
   }
 
   @ApiOperation({ summary: 'Update a user by id' })
