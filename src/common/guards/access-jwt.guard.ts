@@ -9,12 +9,12 @@ export class AtJwtGuard extends AuthGuard('jwt-access') {
         super();
     }
 
-    canActivate(context: ExecutionContext): Observable<boolean> | Promise<boolean> | boolean {
+    canActivate(ctx: ExecutionContext): Observable<boolean> | Promise<boolean> | boolean {
         // Create public metadata for routes and controllers to bypass authentication
-        const isPublic = this.reflector.get<boolean>('isPublic', context.getHandler());
+        const isPublic = this.reflector.get<boolean>('isPublic', ctx.getHandler());
         if (isPublic) {
             return true;
         }
-        return super.canActivate(context);
+        return super.canActivate(ctx);
     }
 }

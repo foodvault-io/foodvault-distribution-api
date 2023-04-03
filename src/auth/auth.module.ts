@@ -11,7 +11,7 @@ import {
   LinkedInStrategy
 } from './strategies';
 import { JwtModule } from '@nestjs/jwt';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [

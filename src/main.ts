@@ -1,6 +1,6 @@
 import { NestFactory, HttpAdapterHost, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 import {
   SwaggerModule,
@@ -42,6 +42,7 @@ async function bootstrap() {
     .setTitle('FoodVault API')
     .setDescription('FoodVault API description')
     .setVersion('1.0.0')
+    .addServer('http://localhost:3000', 'Development server')
     .build();
 
   const options: SwaggerDocumentOptions = {
@@ -53,9 +54,11 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config, options);
   SwaggerModule.setup('swagger', app, document);
+  
 
   // Start the server
   await app.listen(process.env.PORT || 3000);
-  console.log(`Application is running on: ${await app.getUrl()}`)
+  const logger = new Logger('Bootstrap');
+  logger.log(`FoodVault is running on: ${await app.getUrl()}`)
 }
 bootstrap();
