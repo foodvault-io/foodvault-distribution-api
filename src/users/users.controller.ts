@@ -8,7 +8,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { GetCurrentUser, Public } from '../common/decorators';
-import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles, UserRoles } from 'nest-access-control';
+import { ACGuard, InjectRolesBuilder, RolesBuilder } from 'nest-access-control';
 import { JwtPayload } from 'src/auth/types';
 
 const resource = 'user';

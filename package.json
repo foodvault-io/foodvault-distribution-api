@@ -8,12 +8,12 @@
   "scripts": {
     "prisma:prod:deploy": "npx prisma migrate deploy",
     "prisma:dev:deploy": "prisma migrate deploy dev",
-    "db:dev:rm": "docker compose rm db -s -f -v",
-    "db:dev:up": "docker compose up db -d",
+    "db:dev:rm": "docker compose rm db-mysql -s -f -v",
+    "db:dev:up": "docker compose up db-mysql -d",
     "db:dev:restart": "pnpm run db:dev:rm && pnpm run db:dev:up && sleep 1 && pnpm run prisma:dev:deploy",
-    "prisma:test:deploy": "dotenv -e .env.test -- prisma migrate deploy dev",
-    "db:test:rm": "docker compose rm test-db -s -f -v",
-    "db:test:up": "docker compose up test-db -d",
+    "prisma:test:deploy": "dotenv -e .env.test -- prisma migrate dev",
+    "db:test:rm": "docker compose rm test-db-mysql -s -f -v",
+    "db:test:up": "docker compose up test-db-mysql -d",
     "db:test:restart": "pnpm run db:test:rm && pnpm run db:test:up && sleep 1 && pnpm run prisma:test:deploy",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -38,7 +38,7 @@
     "@nestjs/jwt": "^10.0.2",
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
-    "@prisma/client": "^4.12.0",
+    "@prisma/client": "^4.11.0",
     "argon2": "^0.30.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
@@ -55,6 +55,7 @@
     "webpack": "^5.0.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@golevelup/ts-jest": "^0.3.5",
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
@@ -85,6 +86,7 @@
     "ts-jest": "29.0.3",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
+    "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "4.1.1",
     "typescript": "^4.7.4",
     "uuid": "^9.0.0"
@@ -154,6 +156,6 @@
     ]
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node-dev --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   }
 }
