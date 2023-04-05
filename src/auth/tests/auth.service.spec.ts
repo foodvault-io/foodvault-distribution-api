@@ -6,12 +6,11 @@ import { JwtService } from '@nestjs/jwt';
 import { LocalAuthDto, LocalSignInDto } from '../dto';
 import { v4 as uuidv4 } from 'uuid';
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
-import { RoleEnum } from '@prisma/client';
+import { RoleEnum, UserStatus } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { OAuthUser, Token, Tokens } from '../types';
 import { GoogleStrategy } from '../strategies';
 import { PassportModule } from '@nestjs/passport';
-
 
 // Users:
 const id = uuidv4();
@@ -245,6 +244,7 @@ describe('AuthService', () => {
                 userId: user.id,
                 providerType: providerType,
                 provider: provider,
+                status: UserStatus.ACTIVE,
                 providerAccountId: providerAccountId,
                 accessToken: accessToken,
                 accessTokenExpires: accessTokenExpires,
@@ -317,6 +317,7 @@ describe('AuthService', () => {
             userId: userId,
             providerType: providerType,
             provider: provider,
+            status: UserStatus.ACTIVE,
             providerAccountId: providerAccountId,
             accessToken: accessToken,
             accessTokenExpires: accessTokenExpires,
@@ -356,21 +357,21 @@ describe('AuthService', () => {
         it('should return an object with access and refresh tokens', async () => {
             const userId = 'testUserId';
             const email = 'test@test.com';
-            const role = 'user';
+            const roles = 'user';
             const tokens: Tokens = {
                 accessToken: 'testAccessToken',
                 refreshToken: 'testRefreshToken',
             };
 
             jest.spyOn(jwtService, 'signAsync').mockImplementation((payload: any, options: any) => {
-                if (options.expiresIn === 60 * 15) {
+                if (options.expiresIn === 900) {
                     return Promise.resolve('testAccessToken');
                 } else {
                     return Promise.resolve('testRefreshToken');
                 }
             });
 
-            const result = await service.getTokens(userId, email, role);
+            const result = await service.getTokens(userId, email, roles);
 
             expect(result).toEqual(tokens);
             expect(jwtService.signAsync).toHaveBeenCalledTimes(2);
@@ -378,22 +379,22 @@ describe('AuthService', () => {
                 {
                     userId: userId,
                     email: email,
-                    role: role,
+                    roles: roles,
                 },
                 {
                     secret: config.get('AT_JWT_SECRET_KEY'),
-                    expiresIn: 60 * 15,
+                    expiresIn: 900,
                 },
             );
             expect(jwtService.signAsync).toHaveBeenCalledWith(
                 {
                     userId: userId,
                     email: email,
-                    role: role,
+                    roles: roles,
                 },
                 {
                     secret: config.get('RT_JWT_SECRET_KEY'),
-                    expiresIn: 60 * 60 * 24 * 7, // 7 days
+                    expiresIn: 60 * 60 * 24 * 30, // 7 days
                 },
             );
         });
@@ -403,20 +404,20 @@ describe('AuthService', () => {
         it('should return an object with access tokens', async () => {
             const userId = 'testUserId';
             const email = 'test@test.com';
-            const role = 'user';
+            const roles = 'user';
             const tokens: Token = {
                 accessToken: 'testAccessToken',
             };
 
             jest.spyOn(jwtService, 'signAsync').mockImplementation((payload: any, options: any) => {
-                if (options.expiresIn === 60 * 15) {
+                if (options.expiresIn === 900) {
                     return Promise.resolve('testAccessToken');
                 } else {
                     return Promise.resolve('testRefreshToken');
                 }
             });
 
-            const result = await service.getAccessToken(userId, email, role);
+            const result = await service.getAccessToken(userId, email, roles);
 
             expect(result).toEqual(tokens);
             expect(jwtService.signAsync).toHaveBeenCalledTimes(1);
@@ -424,11 +425,11 @@ describe('AuthService', () => {
                 {
                     userId: userId,
                     email: email,
-                    role: role,
+                    roles: roles,
                 },
                 {
                     secret: config.get('AT_JWT_SECRET_KEY'),
-                    expiresIn: 60 * 15,
+                    expiresIn: 900,
                 },
             );
         });
@@ -462,6 +463,7 @@ describe('AuthService', () => {
                 userId: user.id,
                 providerType: 'oauth-google',
                 provider: 'google',
+                status: UserStatus.ACTIVE,
                 providerAccountId: '1234567',
                 accessToken: tokens.accessToken,
                 accessTokenExpires: accessTokenExpires,
@@ -505,6 +507,7 @@ describe('AuthService', () => {
                 userId: user.id,
                 providerType: 'oauth-google',
                 provider: 'google',
+                status: UserStatus.ACTIVE,
                 providerAccountId: '123456789',
                 accessToken: tokens.accessToken,
                 accessTokenExpires: accessTokenExpires,
@@ -558,6 +561,7 @@ describe('AuthService', () => {
                 provider: 'facebook',
                 providerAccountId: '123456789',
                 accessToken: tokens.accessToken,
+                status: UserStatus.ACTIVE,
                 accessTokenExpires: accessTokenExpires,
                 tokenType: tokenType,
                 refreshToken: await argon2.hash(refreshToken),
@@ -633,6 +637,7 @@ describe('AuthService', () => {
             const incorrectAccount = {
                 id: 'a uuid',
                 userId: user.id,
+                status: UserStatus.ACTIVE,
                 providerType: 'oauth-google',
                 provider: 'google',
                 providerAccountId: '12345',

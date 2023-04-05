@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 enum RoleEnum {
@@ -26,9 +27,9 @@ model User {
   email String @unique
   firstName String
   lastName String
-  hashedPassword String?
-  image String?
-  role RoleEnum[] @default([USER])
+  hashedPassword String? @db.VarChar(1000)
+  image String? @db.VarChar(1000)
+  role RoleEnum @default(USER)
 
   accounts Account?
   restuarantsOwned RestaurantDetails[]
@@ -49,14 +50,15 @@ model Account {
 
   userId String @unique
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status UserStatus @default(ACTIVE)
 
 
   providerType String @default("local")
   provider String @default("local")
   providerAccountId String
 
-  refreshToken String?
-  accessToken String?
+  refreshToken String? @db.VarChar(1000)
+  accessToken String? @db.VarChar(1000)
   accessTokenExpires Int? // In minutes
   tokenType String?
 
@@ -77,19 +79,18 @@ model RestaurantDetails {
   id String @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  deletedAt DateTime?
 
   status RestaurantStatus @default(ACTIVE)
 
   // Restaurant Info
   name String 
   phone String
-  description String? 
+  description String? @db.MediumText
   website String?
-  image String?
+  image String? @db.VarChar(500)
 
   // Location Data
-  address String
+  address String @db.VarChar(500)
 
   cityId String
   city City @relation(fields: [cityId], references: [id])
@@ -124,7 +125,6 @@ model RestaurantOrder {
   id String @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  deletedAt DateTime?
 
   // Items Ordered
   orderItems OrderItem[]
@@ -140,7 +140,6 @@ model OrderItem {
   id String @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  deletedAt DateTime?
 
   quantity Int
 
@@ -149,8 +148,8 @@ model OrderItem {
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   // Placed Order
-  orderPlacedId String?
-  orderPlaced RestaurantOrder? @relation(fields: [orderPlacedId], references: [id], onDelete: Cascade)
+  orderPlacedId String
+  orderPlaced RestaurantOrder @relation(fields: [orderPlacedId], references: [id], onDelete: Cascade)
 
   @@map("orderItem")
 }
@@ -159,15 +158,16 @@ model Product {
   id        String @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  deletedAt DateTime?
 
   // Product Info
   name String // Name of the item
-  description String?
-  size Float? // Size of the item in oz, lbs, etc
+  description String? @db.VarChar(250)
+  sizeValue Float?
+  sizeUnit String? // Size of the item in oz, lbs, etc
+  size String?
 
   rating Float @default(3.5) // 1-5 
-  tags String[]  // Tags for the food item such as Premium, Gluten Free, vegan, etc
+  tags Tag[]  // Tags for the food item such as Premium, Gluten Free, vegan, etc
 
   // Logo
   image Media[]
@@ -181,18 +181,25 @@ model Product {
   @@map("product")
 }
 
+model Tag {
+  id Int @id @default(autoincrement())
+  name String 
+  products Product[]
+
+  @@map("tags")
+}
+
 //// Previous Orders Model 
 // Food Order Models
 model FoodOrder {
   id String @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  deletedAt DateTime?
 
   // Order Info
   orderName String
   dateOfOrder DateTime?
-  orderDescription String?
+  orderDescription String? @db.VarChar(250)
   orderItems FoodOrderItem[]
 
   // Distributor Info
@@ -211,13 +218,12 @@ model FoodOrderItem {
   id String @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  deletedAt DateTime?
 
   // Order Info
   productName String
   productId String?
   product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  description String?
+  description String? @db.VarChar(500)
   quantity Int
   price Decimal
 
@@ -232,17 +238,16 @@ model Distributor {
   id String @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  deletedAt DateTime?
 
   // Distributor Info
   name String
-  description String?
+  description String? @db.VarChar(500)
   email String?
   phone String?
-  website String?
+  website String? @db.VarChar(250)
   
   // Location Data
-  address String
+  address String @db.VarChar(250)
 
   cityId String
   city City @relation(fields: [cityId], references: [id])
@@ -274,12 +279,10 @@ model City {
   stateId String
   state State @relation(fields: [stateId], references: [id], onDelete: Cascade)
 
-  countryId String
-  country Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
-
   restaurantDetails RestaurantDetails[]
   distributor Distributor[]
 
+  @@unique([name, stateId])
   @@map("city")
 }
 
@@ -296,15 +299,15 @@ model State {
   restaurantDetails RestaurantDetails[]
   distributor Distributor[]
 
+  @@unique([code, countryId])
   @@map("state")
 }
 
 model Country {
   id String @id @default(uuid())
-  name String
+  name String @unique
   code String
 
-  city City[]
   state State[]
 
   restaurantDetails RestaurantDetails[]
@@ -318,10 +321,9 @@ model Media {
   id String @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  deletedAt DateTime?
   fileName String
   fileSize BigInt 
-  fileUrl String
+  fileUrl String @db.VarChar(500)
   fileType String
 
   

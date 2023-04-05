@@ -232,7 +232,7 @@ export class AuthService {
         }
     }
 
-    async getTokens(userId: string, email: string, role: string[]): Promise<Tokens> {
+    async getTokens(userId: string, email: string, role: string): Promise<Tokens> {
         const [at, rt] = await Promise.all([
             this.jwtService.signAsync({
                 userId: userId,
@@ -249,7 +249,7 @@ export class AuthService {
                 roles: role,
             }, {
                 secret: this.config.get('RT_JWT_SECRET_KEY'),
-                expiresIn: 60 * 60 * 24 * 7, // 7 days
+                expiresIn: 60 * 60 * 24 * 30, // 30 days
             }
             ),
         ]);
@@ -261,7 +261,7 @@ export class AuthService {
 
     }
 
-    async getAccessToken(userId: string, email: string, role: string[]): Promise<Token> {
+    async getAccessToken(userId: string, email: string, role: string): Promise<Token> {
         const at = await this.jwtService.signAsync({
             userId: userId,
             email: email,
