@@ -41,7 +41,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not Found');
     }
 
     if (user.hashedPassword) {
@@ -59,7 +59,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not Found');
     }
 
     if (user.hashedPassword) {

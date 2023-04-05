@@ -17,7 +17,6 @@ import { RBAC_POLICY } from './auth/rbca.policy';
     RestaurantsModule,
   ],
   controllers: [],
-  providers: [
-  ],
+  providers: [],
 })
 export class AppModule { }

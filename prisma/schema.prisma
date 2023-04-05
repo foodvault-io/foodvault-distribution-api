@@ -28,7 +28,7 @@ model User {
   firstName String
   lastName String
   hashedPassword String? @db.VarChar(1000)
-  image String?
+  image String? @db.VarChar(1000)
   role RoleEnum @default(USER)
 
   accounts Account?

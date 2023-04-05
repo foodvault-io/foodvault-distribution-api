@@ -7,14 +7,14 @@
   "license": "UNLICENSED",
   "scripts": {
     "prisma:prod:deploy": "npx prisma migrate deploy",
-    "prisma:dev:deploy": "prisma migrate deploy dev",
+    "prisma:dev:deploy": "prisma migrate dev",
     "db:dev:rm": "docker compose rm db-mysql -s -f -v",
     "db:dev:up": "docker compose up db-mysql -d",
-    "db:dev:restart": "pnpm run db:dev:rm && pnpm run db:dev:up && sleep 1 && pnpm run prisma:dev:deploy",
-    "prisma:test:deploy": "dotenv -e .env.test -- prisma migrate dev",
+    "db:dev:restart": "pnpm run db:dev:rm && pnpm run db:dev:up && sleep 5 && pnpm run prisma:dev:deploy",
+    "prisma:test:deploy": "dotenv -e .env.test -- prisma migrate deploy",
     "db:test:rm": "docker compose rm test-db-mysql -s -f -v",
     "db:test:up": "docker compose up test-db-mysql -d",
-    "db:test:restart": "pnpm run db:test:rm && pnpm run db:test:up && sleep 1 && pnpm run prisma:test:deploy",
+    "db:test:restart": "pnpm run db:test:rm && pnpm run db:test:up && sleep 5 && pnpm run prisma:test:deploy",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -120,8 +120,7 @@
       "<rootDir>/auth/types/",
       "<rootDir>/auth/auth.module.ts",
       "<rootDir>/users/users.module.ts",
-      "<rootDir>/users/dto/index.ts",
-      "<rootDir>/users/entities"
+      "<rootDir>/users/dto/index.ts"
     ],
     "coveragePathIgnorePatterns": [
       "/dist/",
@@ -137,9 +136,7 @@
       "<rootDir>/auth/auth.module.ts",
       "<rootDir>/users/users.module.ts",
       "<rootDir>/users/dto/index.ts",
-      "<rootDir>/users/entities",
       "<rootDir>/restaurants/restaurant.module.ts",
-      "<rootDir>/restaurants/entities",
       "<rootDir>/restaurants/dto/index.ts"
     ],
     "reporters": [
