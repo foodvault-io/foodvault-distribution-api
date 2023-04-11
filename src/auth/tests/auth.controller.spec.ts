@@ -23,7 +23,7 @@ describe('AuthController', () => {
     });
 
     describe('signUpLocally()', () => {
-        const signUpDto: LocalAuthDto = { email: 'test', password: 'password', firstName: 'John', lastName: 'Doe' };
+        const signUpDto: LocalAuthDto = { email: 'test', password: 'password', firstName: 'John', lastName: 'Doe', role: 'ADMIN' };
         const tokens: Tokens = { accessToken: 'access_token', refreshToken: 'refresh_token' };
 
         it('should return tokens when user is created', async () => {
