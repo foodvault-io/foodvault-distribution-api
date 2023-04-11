@@ -127,6 +127,7 @@ describe('AuthService', () => {
                 firstName: userFirstName1,
                 lastName: userLastName1,
                 password: userPassword1,
+                role: RoleEnum.USER,
             });
             expect(user).toEqual(createUser);
         });
@@ -150,6 +151,7 @@ describe('AuthService', () => {
                 firstName: userFirstName1,
                 lastName: userLastName1,
                 password: userPassword1,
+                role: RoleEnum.USER,
             };
             const tokens = {
                 accessToken: 'accessToken',
@@ -173,6 +175,7 @@ describe('AuthService', () => {
                 firstName: userFirstName1,
                 lastName: userLastName1,
                 password: userPassword1,
+                role: RoleEnum.USER,
             };
 
             const error = new Error('P2002');
@@ -189,6 +192,7 @@ describe('AuthService', () => {
                 firstName: userFirstName1,
                 lastName: userLastName1,
                 password: userPassword1,
+                role: RoleEnum.USER,
             };
 
             const error = new Error;

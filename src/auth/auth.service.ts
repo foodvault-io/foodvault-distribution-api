@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { LocalAuthDto } from './dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { RoleEnum, User } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { Token, Tokens, OAuthUser } from './types';
 
@@ -34,6 +34,7 @@ export class AuthService {
                 firstName: localAuthDto.firstName,
                 lastName: localAuthDto.lastName,
                 password: securePassword,
+                role: localAuthDto.role? localAuthDto.role : RoleEnum.USER
             });
 
             // Create Tokens:
@@ -98,6 +99,7 @@ export class AuthService {
                 firstName: oAuthUser.firstName,
                 lastName: oAuthUser.lastName,
                 password: secureProviderId,
+                role: oAuthUser.role? oAuthUser.role : RoleEnum.USER,
             });
 
             if (oAuthUser.photo) {
@@ -285,6 +287,7 @@ export class AuthService {
                 firstName: createUserDto.firstName,
                 lastName: createUserDto.lastName,
                 hashedPassword: createUserDto.password,
+                role: createUserDto.role? createUserDto.role : RoleEnum.USER,
             }
         });
 

@@ -44,7 +44,7 @@ describe('Local Auth Login (e2e)', () => {
   });
 
   describe('Local Auth SignUp ', () => {
-    it('Should Create a new User with Local SignUp', async () => {
+    it('Should Create a new User with Admin Role Local SignUp', async () => {
       return await pactum.spec()
         .post('/auth/local/signup')
         .withHeaders('Content-Type', 'application/json')
@@ -53,17 +53,34 @@ describe('Local Auth Login (e2e)', () => {
           lastName: 'Doe',
           email: 'john_doe@gmail.com',
           password: '12345678',
+          role: 'ADMIN',
         })
         .expectStatus(201)
         .stores('jwt-access', 'accessToken')
         .stores('jwt-refresh', 'refreshToken')
     });
 
+    it('Should Create a new User with User Role Local SignUp', async () => {
+      return await pactum.spec()
+        .post('/auth/local/signup')
+        .withHeaders('Content-Type', 'application/json')
+        .withBody({
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'johnDoe@gmail.com',
+          password: '12345678',
+          role: 'USER',
+        })
+        .expectStatus(201)
+        .stores('user-jwt-access', 'accessToken')
+        .stores('user-jwt-refresh', 'refreshToken')
+    });
+
     it('should return all users', async () => {
       return await pactum.spec()
         .get('/users/')
         .expectStatus(200)
-        .expectJsonLength(1)
+        .expectJsonLength(2)
         .stores('FirstUserId', '[0].id')
         .stores('FirstUserEmail', '[0].email')
         .stores('createdAt', '[0].createdAt')
@@ -88,6 +105,13 @@ describe('Local Auth Login (e2e)', () => {
           role: '$S{userRole}',
         });
     });
+
+    it('should return me', async () => {
+      return await pactum.spec()
+        .get('/users/get/me')
+        .withHeaders('Authorization', 'Bearer $S{user-jwt-access}')
+        .expectStatus(200)
+    })
 
     it('should return user by email', async () => {
       return await pactum.spec()
@@ -125,7 +149,7 @@ describe('Local Auth Login (e2e)', () => {
       return await pactum.spec()
         .get('/users/')
         .expectStatus(200)
-        .expectJsonLength(1)
+        .expectJsonLength(2)
         .stores('FirstUserId', '[0].id')
         .stores('FirstUserEmail', '[0].email')
         .stores('createdAt', '[0].createdAt')
@@ -194,7 +218,7 @@ describe('Local Auth Login (e2e)', () => {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $S{jwt-access}'
         })
-        .expectStatus(201)
+        .expectStatus(204)
     });
   })
 });

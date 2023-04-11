@@ -1,7 +1,9 @@
+import { RoleEnum } from '@prisma/client';
 import {
     IsNotEmpty,
     IsString,
     IsEmail,
+    IsEnum,
 } from 'class-validator';
 
 export class LocalAuthDto {
@@ -21,4 +23,9 @@ export class LocalAuthDto {
     @IsNotEmpty()
     @IsString()
     lastName: string;
+
+    @IsEnum(
+        RoleEnum,
+    )
+    role: RoleEnum;
 }

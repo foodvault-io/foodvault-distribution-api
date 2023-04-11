@@ -10,11 +10,11 @@
     "prisma:dev:deploy": "prisma migrate dev",
     "db:dev:rm": "docker compose rm db-mysql -s -f -v",
     "db:dev:up": "docker compose up db-mysql -d",
-    "db:dev:restart": "pnpm run db:dev:rm && pnpm run db:dev:up && sleep 5 && pnpm run prisma:dev:deploy",
+    "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up && sleep 5 && npm run prisma:dev:deploy",
     "prisma:test:deploy": "dotenv -e .env.test -- prisma migrate deploy",
     "db:test:rm": "docker compose rm test-db-mysql -s -f -v",
     "db:test:up": "docker compose up test-db-mysql -d",
-    "db:test:restart": "pnpm run db:test:rm && pnpm run db:test:up && sleep 5 && pnpm run prisma:test:deploy",
+    "db:test:restart": "npm run db:test:rm && npm run db:test:up && sleep 5 && npm run prisma:test:deploy",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -22,13 +22,13 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "pnpm run db:test:restart && dotenv -e .env.test -- jest",
-    "test:watch": "pnpm run db:test:restart && dotenv -e .env.test -- jest --watch",
-    "test:cov": "pnpm run db:test:restart && dotenv -e .env.test -- jest --coverage",
+    "test": "npm run db:test:restart && dotenv -e .env.test -- jest",
+    "test:watch": "npm run db:test:restart && dotenv -e .env.test -- jest --watch",
+    "test:cov": "npm run db:test:restart && dotenv -e .env.test -- jest --coverage",
     "make-badges": "istanbul-badges-readme --logo='jest' --badge-style='plastic'",
-    "make-badges:ci": "pnpm run make-badges -- --ci",
-    "test:debug": "pnpm run db:test:restart && dotenv -e .env.test -- node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "pnpm run db:test:restart && dotenv -e .env.test -- jest --no-cache --watch --config ./test/jest-e2e.json"
+    "make-badges:ci": "npm run make-badges -- --ci",
+    "test:debug": "npm run db:test:restart && dotenv -e .env.test -- node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "npm run db:test:restart && dotenv -e .env.test -- jest --no-cache --watch --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/class-validator": "^0.13.4",
@@ -136,8 +136,9 @@
       "<rootDir>/auth/auth.module.ts",
       "<rootDir>/users/users.module.ts",
       "<rootDir>/users/dto/index.ts",
-      "<rootDir>/restaurants/restaurant.module.ts",
-      "<rootDir>/restaurants/dto/index.ts"
+      "<rootDir>/restaurants/restaurants.module.ts",
+      "<rootDir>/restaurants/dto/index.ts",
+      "<rootDir>/restaurants/entities"
     ],
     "reporters": [
       "default",

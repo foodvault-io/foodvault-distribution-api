@@ -1,0 +1,39 @@
+name: FoodVault Distribution Dev Deployments
+
+on:
+  push: 
+    branches: ["dev"]
+
+jobs:
+  build: 
+    runs-on: ubuntu-latest
+
+    strategy: 
+      matrix: 
+        node-version: [16.x, 18.x]
+
+    environment: 
+      name: development
+    
+    steps: 
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with: 
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --if-present
+
+      - name: Deploy Prisma Migrations
+        run: npx prisma migrate deploy 
+        env: 
+          DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Deploy to Railway
+        run: railway up
+        env: 
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_DEVELOPMENT }}
