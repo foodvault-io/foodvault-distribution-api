@@ -27,7 +27,7 @@ jobs:
       - run: npm run build --if-present
 
       - name: Deploy Prisma Migrations
-        run: npx prisma migrate dev 
+        run: npx prisma migrate deploy
         env: 
           DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
       - name: Install Railway CLI
