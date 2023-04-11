@@ -7,8 +7,8 @@
 .env.local
 
 # Database files
-/backup-db 
-/db 
+/db-mysql
+/test-db-mysql
 
 # compiled output
 /dist

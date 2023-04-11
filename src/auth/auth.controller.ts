@@ -3,17 +3,13 @@ import {
     Controller,
     Post,
     UseGuards,
-    Get
+    Get,
+    HttpCode,
+    HttpStatus,
+    Logger
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthDto } from './dto';
-import { Login, SignUp, OpenAuthUser, Token } from './entities';
-import {
-    ApiHeaders,
-    ApiOperation,
-    ApiResponse,
-    ApiTags,
-} from '@nestjs/swagger';
 import { OAuthUser, Tokens } from './types';
 import {
     RtJwtGuard,
@@ -30,7 +26,6 @@ import {
 } from '../common/decorators';
 
 
-@ApiTags('Auth')
 @Controller({
     path: 'auth',
     version: '1',
@@ -41,12 +36,6 @@ export class AuthController {
     ) { }
 
     // Local SignUp
-    @ApiOperation({ summary: 'Create User Using the Local Strategy' })
-    @ApiResponse({
-        status: 201,
-        description: 'New User Created',
-        type: SignUp,
-    })
     @Public()
     @Post('/local/signup')
     async signUpLocally(@Body() signUpDto: LocalAuthDto): Promise<Tokens> {
@@ -54,40 +43,23 @@ export class AuthController {
     }
 
     // Local Login
-    @ApiOperation({ summary: 'Sign In Using the Local Strategy' })
-    @ApiResponse({
-        status: 201,
-        description: 'User Signed In',
-        type: Login,
-    })
     @Public()
     @UseGuards(LocalAuthGuard)
     @Post('/local/login')
     signInLocally(
-        @UserFromOAuth() user: Tokens
+        @UserFromOAuth() tokens: Tokens
     ) {
-        return user;
+        return tokens;
     }
 
     // Google Controllers
-    @ApiOperation({ summary: 'Sign In / Sign Up Route for Google' })
-    @ApiResponse({
-        status: 200,
-        description: 'User Signed In / Signed Up With Google Strategy',
-    })
     @Public()
     @UseGuards(GoogleAuthGuard)
     @Get('/google')
-    async googleAuth() {
+    async googleAuth() { 
         console.log('Google Auth Route Initiated')
     }
 
-    @ApiOperation({ summary: 'Google Strategy Callback Route' })
-    @ApiResponse({
-        status: 200,
-        description: 'Return Data From Google Strategy',
-        type: OpenAuthUser,
-    })
     @Public()
     @UseGuards(GoogleAuthGuard)
     @Get('/google/callback')
@@ -98,11 +70,6 @@ export class AuthController {
     }
 
     // Facebook Controllers
-    @ApiOperation({ summary: 'Sign In / Sign Up Route for Facebook' })
-    @ApiResponse({
-        status: 200,
-        description: 'User Signed In / Signed Up With Facebook Strategy',
-    })
     @Public()
     @UseGuards(FacebookAuthGuard)
     @Get('/facebook')
@@ -110,12 +77,6 @@ export class AuthController {
         console.log('Facebook Auth Route Initiated')
     }
 
-    @ApiOperation({ summary: 'Facebook Strategy Callback Route' })
-    @ApiResponse({
-        status: 200,
-        description: 'Return Data From Facebook Strategy',
-        type: OpenAuthUser,
-    })
     @Public()
     @UseGuards(FacebookAuthGuard)
     @Get('/facebook/callback')
@@ -126,11 +87,6 @@ export class AuthController {
     }
 
     // LinkedIn Controllers
-    @ApiOperation({ summary: 'Sign In / Sign Up Route for LinkedIn' })
-    @ApiResponse({
-        status: 200,
-        description: 'User Signed In / Signed Up With LinkedIn Strategy',
-    })
     @Public()
     @UseGuards(LinkedInAuthGuard)
     @Get('/linkedin')
@@ -138,12 +94,6 @@ export class AuthController {
         console.log('LinkedIn Auth Route Initiated')
     }
 
-    @ApiOperation({ summary: 'LinkedIn Strategy Callback Route' })
-    @ApiResponse({
-        status: 200,
-        description: 'Return Data From LinkedIn Strategy',
-        type: OpenAuthUser,
-    })
     @Public()
     @UseGuards(LinkedInAuthGuard)
     @Get('/linkedin/callback')
@@ -154,43 +104,13 @@ export class AuthController {
     }
 
     // Logout Route
-    @ApiOperation({ summary: 'Logout Route.  This erases Refresh Token Hash from account table' })
-    @ApiResponse({
-        status: 200,
-        description: 'User Logged Out',
-    })
-    @ApiHeaders([
-        {
-            name: 'Authorization',
-            description: 'Access Bearer Token',
-            required: true,
-        },
-        {
-            name: 'Content-Type',
-            description: 'Content Type',
-            required: true,
-            example: 'application/json',
-        }
-    ])
+    @HttpCode(HttpStatus.NO_CONTENT)
     @Post('logout')
     logout(@GetCurrentUserId() userId: string) {
         return this.authService.localLogout(userId);
     }
 
     // Refresh Token
-    @ApiOperation({ summary: 'Refresh Access Token Route' })
-    @ApiResponse({
-        status: 200,
-        description: 'Access Token Refreshed',
-        type: Token,
-    })
-    @ApiHeaders([
-        {
-            name: 'Authorization',
-            description: 'Refresh Bearer Token',
-            required: true,
-        },
-    ])
     @Public()
     @UseGuards(RtJwtGuard)
     @Post('/refresh')

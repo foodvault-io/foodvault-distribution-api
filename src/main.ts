@@ -1,12 +1,7 @@
 import { NestFactory, HttpAdapterHost, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
-import {
-  SwaggerModule,
-  DocumentBuilder,
-  SwaggerDocumentOptions,
-} from '@nestjs/swagger';
 import { AtJwtGuard } from './common/guards';
 
 async function bootstrap() {
@@ -36,26 +31,10 @@ async function bootstrap() {
   // Enable global exception filter
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
-
-  // Initialize Swagger
-  const config = new DocumentBuilder()
-    .setTitle('FoodVault API')
-    .setDescription('FoodVault API description')
-    .setVersion('1.0.0')
-    .build();
-
-  const options: SwaggerDocumentOptions = {
-    operationIdFactory: (
-      controllerKey: string,
-      methodKey: string,
-    ) => methodKey
-  };
-
-  const document = SwaggerModule.createDocument(app, config, options);
-  SwaggerModule.setup('swagger', app, document);
-
+  
   // Start the server
   await app.listen(process.env.PORT || 3000);
-  console.log(`Application is running on: ${await app.getUrl()}`)
+  const logger = new Logger('Bootstrap');
+  logger.log(`FoodVault is running on: ${await app.getUrl()}`)
 }
 bootstrap();

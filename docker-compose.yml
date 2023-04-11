@@ -1,40 +1,30 @@
 version: '3.8'
 
 services: 
-  db: 
-    image: postgres:latest
+  db-mysql:
+    image: mysql:latest
+    cap_add:
+      - SYS_NICE
     restart: always
-    environment: 
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_USER: user
-      POSTGRES_DB: db
-    ports: 
-      - 5432:5432
-    volumes: 
-      - ./db/data:/var/lib/postgresql/data
-  test-db: 
-    image: postgres:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: db-mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db-mysql/data:/var/lib/mysql
+  test-db-mysql:
+    image: mysql:latest
+    cap_add:
+      - SYS_NICE
     restart: always
-    environment: 
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_USER: user
-      POSTGRES_DB: test-db
-    ports: 
-      - 5434:5432
-  backup-db: 
-    image: postgres:latest
-    environment: 
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_USER: user
-      POSTGRES_DB: backup-db
-      POSTGRES_MASTER_HOST: db 
-      POSTGRES_MASTER_PORT: 5432
-    volumes: 
-      - ./backup-db/data:/var/lib/postgresql/data
-    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: test-db-mysql
+    ports:
+      - 3307:3306
+
 
 volumes: 
-  db: 
-    driver: local
-  backup-db:
+  db-mysql:
     driver: local
