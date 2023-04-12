@@ -7,11 +7,11 @@
   "license": "UNLICENSED",
   "scripts": {
     "prisma:prod:deploy": "npx prisma migrate deploy",
-    "prisma:dev:deploy": "prisma migrate dev",
+    "prisma:dev:deploy": "prisma db push",
     "db:dev:rm": "docker compose rm db-mysql -s -f -v",
     "db:dev:up": "docker compose up db-mysql -d",
     "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up && sleep 5 && npm run prisma:dev:deploy",
-    "prisma:test:deploy": "dotenv -e .env.test -- prisma migrate deploy",
+    "prisma:test:deploy": "dotenv -e .env.test -- prisma db push",
     "db:test:rm": "docker compose rm test-db-mysql -s -f -v",
     "db:test:up": "docker compose up test-db-mysql -d",
     "db:test:restart": "npm run db:test:rm && npm run db:test:up && sleep 5 && npm run prisma:test:deploy",

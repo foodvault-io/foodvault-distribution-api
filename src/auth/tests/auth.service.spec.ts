@@ -446,7 +446,7 @@ describe('AuthService', () => {
 
         it('Should Create a new User if its first time logging in and return tokens', async () => {
             const profile: OAuthUser = {
-                providerId: '123456789',
+                providerAccountId: '123456789',
                 provider: 'google',
                 firstName: 'User',
                 lastName: 'Test',
@@ -490,7 +490,7 @@ describe('AuthService', () => {
 
         it('Should return tokens if user already exists and signed in with Google before', async () => {
             const profile: OAuthUser = {
-                providerId: '123456789',
+                providerAccountId: '123456789',
                 provider: 'google',
                 firstName: 'User',
                 lastName: 'Test',
@@ -531,7 +531,7 @@ describe('AuthService', () => {
 
         it('Should throw an error if user already exists and signed in with Google before but the account is not found', async () => {
             const profile: OAuthUser = {
-                providerId: '123456789',
+                providerAccountId: '123456789',
                 provider: 'google',
                 firstName: 'User',
                 lastName: 'Test',
@@ -581,7 +581,7 @@ describe('AuthService', () => {
 
         it('Should throw an error if user already exists and signed in with Google before but the account is not found', async () => {
             const profile: OAuthUser = {
-                providerId: '123456789',
+                providerAccountId: '123456789',
                 provider: 'google',
                 firstName: 'User',
                 lastName: 'Test',
@@ -611,7 +611,7 @@ describe('AuthService', () => {
 
         it('Should throw an error if the providerId is not the same as the one in the database', async () => {
             const profile: OAuthUser = {
-                providerId: '123456789',
+                providerAccountId: '123456789',
                 provider: 'google',
                 firstName: 'User',
                 lastName: 'Test',
