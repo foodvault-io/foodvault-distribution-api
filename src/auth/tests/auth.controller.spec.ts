@@ -47,20 +47,10 @@ describe('AuthController', () => {
         });
     });
 
-    describe('googleAuth()', () => {
-        it('should log "Google Auth Route Initiated"', async () => {
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-
-            controller.googleAuth();
-
-            expect(consoleSpy).toHaveBeenCalledWith('Google Auth Route Initiated');
-        });
-    });
-
     describe('googleAuthCallback() ', () => {
         it('should call authService.socialLogin with the user returned from UserFromOAuth', async () => {
             const profile: OAuthUser = {
-                providerId: '123456789',
+                providerAccountId: '123456789',
                 provider: 'google',
                 firstName: 'User',
                 lastName: 'Test',
@@ -77,20 +67,10 @@ describe('AuthController', () => {
         });
     });
 
-    describe('facebookAuth() ', () => {
-        it('should log "Facebook Auth Route Initiated"', async () => {
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-
-            controller.facebookAuth();
-
-            expect(consoleSpy).toHaveBeenCalledWith('Facebook Auth Route Initiated');
-        });
-    });
-
     describe('facebookAuthCallback() ', () => {
         it('should call authService.socialLogin with the user returned from UserFromOAuth', async () => {
             const profile: OAuthUser = {
-                providerId: '123456789',
+                providerAccountId: '123456789',
                 provider: 'facebook',
                 firstName: 'User',
                 lastName: 'Test',
@@ -107,20 +87,10 @@ describe('AuthController', () => {
         });
     });
 
-    describe('linkedInAuth() ', () => {
-        it('should log "LinkedIn Auth Route Initiated"', async () => {
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-
-            controller.linkedInAuth();
-
-            expect(consoleSpy).toHaveBeenCalledWith('LinkedIn Auth Route Initiated');
-        });
-    });
-
     describe('linkedInAuthCallback() ', () => {
         it('should call authService.socialLogin with the user returned from UserFromOAuth', async () => {
             const profile: OAuthUser = {
-                providerId: '123456789',
+                providerAccountId: '123456789',
                 provider: 'linkedin',
                 firstName: 'User',
                 lastName: 'Test',

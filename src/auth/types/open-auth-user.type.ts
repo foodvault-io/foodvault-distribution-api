@@ -1,7 +1,7 @@
 import { RoleEnum } from "@prisma/client";
 
 export type OAuthUser = {
-    providerId: string;
+    providerAccountId: string;
     provider: string;
     firstName: string;
     lastName: string;

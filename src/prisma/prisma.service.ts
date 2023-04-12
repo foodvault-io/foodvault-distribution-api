@@ -36,9 +36,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
             this.foodOrderItem.deleteMany(),
             this.distributor.deleteMany(),
             this.media.deleteMany(),
-            this.country.deleteMany(),
-            this.state.deleteMany(),
-            this.city.deleteMany(),  
+            this.restaurantAddress.deleteMany(),
+            this.distributorAddress.deleteMany(),
         ])
     }
 }
