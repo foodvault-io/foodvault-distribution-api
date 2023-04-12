@@ -31,63 +31,61 @@ export async function createAdminUser() {
     };
 }
 
-const usStates: {name: string, code: string}[] = [
-    { name: 'Alabama', code: 'AL' },
-    { name: 'Alaska', code: 'AK' },
-    { name: 'Arizona', code: 'AZ' },
-    { name: 'Arkansas', code: 'AR' },
-    { name: 'California', code: 'CA' },
-    { name: 'Colorado', code: 'CO' },
-    { name: 'Connecticut', code: 'CT' },
-    { name: 'Delaware', code: 'DE' },
-    { name: 'Florida', code: 'FL' },
-    { name: 'Georgia', code: 'GA' },
-    { name: 'Hawaii', code: 'HI' },
-    { name: 'Idaho', code: 'ID' },
-    { name: 'Illinois', code: 'IL' },
-    { name: 'Indiana', code: 'IN' },
-    { name: 'Iowa', code: 'IA' },
-    { name: 'Kansas', code: 'KS' },
-    { name: 'Kentucky', code: 'KY' },
-    { name: 'Louisiana', code: 'LA' },
-    { name: 'Maine', code: 'ME' },
-    { name: 'Maryland', code: 'MD' },
-    { name: 'Massachusetts', code: 'MA' },
-    { name: 'Michigan', code: 'MI' },
-    { name: 'Minnesota', code: 'MN' },
-    { name: 'Mississippi', code: 'MS' },
-    { name: 'Missouri', code: 'MO' },
-    { name: 'Montana', code: 'MT' },
-    { name: 'Nebraska', code: 'NE' },
-    { name: 'Nevada', code: 'NV' },
-    { name: 'New Hampshire', code: 'NH' },
-    { name: 'New Jersey', code: 'NJ' },
-    { name: 'New Mexico', code: 'NM' },
-    { name: 'New York', code: 'NY' },
-    { name: 'North Carolina', code: 'NC' },
-    { name: 'North Dakota', code: 'ND' },
-    { name: 'Ohio', code: 'OH' },
-    { name: 'Oklahoma', code: 'OK' },
-    { name: 'Oregon', code: 'OR' },
-    { name: 'Pennsylvania', code: 'PA' },
-    { name: 'Rhode Island', code: 'RI' },
-    { name: 'South Carolina', code: 'SC' },
-    { name: 'South Dakota', code: 'SD' },
-    { name: 'Tennessee', code: 'TN' },
-    { name: 'Texas', code: 'TX' },
-    { name: 'Utah', code: 'UT' },
-    { name: 'Vermont', code: 'VT' },
-    { name: 'Virginia', code: 'VA' },
-    { name: 'Washington', code: 'WA' },
-    { name: 'West Virginia', code: 'WV' },
-    { name: 'Wisconsin', code: 'WI' },
-    { name: 'Wyoming', code: 'WY' }
+const usState: string[] = [
+    'AL',
+    'AK',
+    'AZ',
+    'AR',
+    'CA',
+    'CO',
+    'CT',
+    'DE',
+    'FL',
+    'GA',
+    'HI',
+    'ID',
+    'IL',
+    'IN',
+    'IA',
+    'KS',
+    'KY',
+    'LA',
+    'ME',
+    'MD',
+    'MA',
+    'MI',
+    'MN',
+    'MS',
+    'MO',
+    'MT',
+    'NE',
+    'NV',
+    'NH',
+    'NJ',
+    'NM',
+    'NY',
+    'NC',
+    'ND',
+    'OH',
+    'OK',
+    'OR',
+    'PA',
+    'RI',
+    'SC',
+    'SD',
+    'TN',
+    'TX',
+    'UT',
+    'VT',
+    'VA',
+    'WA',
+    'WV',
+    'WI',
+    'WY',
 ];
 
 const newUsers = [];
 const newAccounts = [];
-const newCities = [];
-const newStates = [];
 const newRestaurants = [];
 const newOrders = [];
 const newOrderItems = [];
@@ -116,28 +114,30 @@ async function main() {
         prisma.foodOrderItem.deleteMany(),
         prisma.distributor.deleteMany(),
         prisma.media.deleteMany(),
-        prisma.country.deleteMany(),
-        prisma.state.deleteMany(),
-        prisma.city.deleteMany(),
+        prisma.distributorAddress.deleteMany(),
     ]);
 
     // create OAuth2 users & accounts
-    for (let i = 0; i <= 49; ++i) {
+    for (let i = 0; i <= 14; ++i) {
         const userData = await createRandomUser();
+
+        const providerAccountId = faker.datatype.string(15);
+
+        const secureProviderId = await argon.hash(providerAccountId)
 
         const user = await prisma.user.create({
             data: {
                 email: userData.email,
                 firstName: userData.firstName,
                 lastName: userData.lastName,
-                hashedPassword: userData.hashedPassword,
+                hashedPassword: secureProviderId,
                 image: userData.image,
                 role: userData.role,
                 accounts: {
                     create: {
                         providerType: 'oauth2',
                         provider: faker.helpers.arrayElement(['google', 'facebook', 'linkedin']),
-                        providerAccountId: faker.datatype.string(15),
+                        providerAccountId: providerAccountId,
                         accessTokenExpires: 60 * 15,
                         tokenType: 'Bearer'
                     }
@@ -184,7 +184,7 @@ async function main() {
     }
 
     // create local users & accounts
-    for (let i = 0; i <= 49; ++i) {
+    for (let i = 0; i <= 14; ++i) {
         const userData = await createRandomUser();
 
         const user = await prisma.user.create({
@@ -199,7 +199,7 @@ async function main() {
                     create: {
                         providerType: 'email',
                         provider: 'local',
-                        providerAccountId: faker.datatype.string(15),
+                        providerAccountId: userData.email,
                         accessTokenExpires: 60 * 15,
                         tokenType: 'Bearer'
                     }
@@ -246,7 +246,7 @@ async function main() {
     }
 
     // create Admin users & Accounts
-    for (let i = 0; i <= 9; ++i) {
+    for (let i = 0; i <= 4; ++i) {
         const userData = await createAdminUser();
 
         const user = await prisma.user.create({
@@ -261,7 +261,7 @@ async function main() {
                     create: {
                         providerType: 'email',
                         provider: 'local',
-                        providerAccountId: faker.datatype.string(15),
+                        providerAccountId: userData.email,
                         accessTokenExpires: 60 * 15,
                         tokenType: 'Bearer'
                     }
@@ -307,51 +307,8 @@ async function main() {
         newAccounts.push(account);
     }
 
-    // Create Country Data;
-    const country = await prisma.country.create({
-        data: {
-            name: 'United States of America', 
-            code: 'USA'
-        }
-    })
-    
-    // Create State Data:
-    for (const state of usStates) {
-        const newState = await prisma.state.create({
-            data: {
-                name: state.name,
-                code: state.code,
-                country: {
-                    connect: {
-                        id: country.id
-                    }
-                }
-            }
-        })
-        
-        newStates.push(newState);
-    }
-    
-    // Create City Data:
-    for (let i = 0; i <= 199; ++i) {
-        const cityName = faker.address.city();
-        
-        const city = await prisma.city.create({
-            data: {
-                name: cityName,
-                state: {
-                    connect: {
-                        id: faker.helpers.arrayElement(newStates).id
-                    }
-                }
-            }
-        });
-        
-        newCities.push(city);
-    }
-
     // Create Media Data: 
-    for (let i = 0; i <= 299; ++i) {
+    for (let i = 0; i <= 29; ++i) {
         const media = await prisma.media.create({
             data: {
                 fileName: faker.system.commonFileName(),
@@ -365,7 +322,9 @@ async function main() {
     }
     
     // Create Restaurant Details Data: 
-    for (let i = 0; i <= 399; ++i) {
+    for (let i = 0; i <= 99; ++i) {
+        const state = faker.helpers.arrayElement(usState)
+
         const restaurantDetails = await prisma.restaurantDetails.create({
             data: {
                 name: faker.company.name(),
@@ -373,25 +332,18 @@ async function main() {
                 description: faker.company.catchPhrase(),
                 website: faker.internet.domainName(),
                 image: faker.image.business(),
-                address: faker.address.streetAddress(true),
-                city: {
-                    connect: {
-                        id: faker.helpers.arrayElement(newCities).id
+                address: {
+                    create: {
+                        address1: faker.address.streetAddress(),
+                        address2: faker.address.secondaryAddress(),
+                        city: faker.address.city(),
+                        state: state,
+                        country: 'USA',
+                        zip: faker.address.zipCodeByState(state),
+                        latitude: parseFloat(faker.address.latitude()),
+                        longitude: parseFloat(faker.address.longitude())
                     }
                 },
-                state: {
-                    connect: {
-                        id: faker.helpers.arrayElement(newStates).id
-                    }
-                },
-                country: {
-                    connect: {
-                        id: country.id
-                    }
-                },
-                zip: faker.address.zipCodeByState(faker.helpers.arrayElement(newStates).code),
-                lat: faker.address.latitude(),
-                lon: faker.address.longitude(),
                 images: {
                     connect: {
                         id: faker.helpers.arrayElement(newMedia).id
@@ -409,7 +361,7 @@ async function main() {
     }
 
     // Restaurant Oders Data: 
-    for (let i = 0; i <= 999; ++i) {
+    for (let i = 0; i <= 199; ++i) {
         const restaurantOrder = await prisma.restaurantOrder.create({
             data: {
                 restaurant: {
@@ -446,7 +398,7 @@ async function main() {
     }
 
     // Product Data: 
-    for (let i = 0; i <= 299; ++i) {
+    for (let i = 0; i <= 59; ++i) {
         const sizeValue = faker.datatype.number(10);
         const sizeUnit = faker.helpers.arrayElement(['oz', 'lb', 'g', 'kg']);
         const size = `${sizeValue} ${sizeUnit}`;
@@ -479,7 +431,7 @@ async function main() {
     }
 
     // Create Order Items Data: 
-    for (let i = 0; i <= 3999; ++i) {
+    for (let i = 0; i <= 199; ++i) {
         const orderItem = await prisma.orderItem.create({
             data: {
                 quantity: faker.datatype.number(100),
@@ -500,10 +452,10 @@ async function main() {
     }
 
     // Create Distributor Data: 
-    for (let i = 0; i <= 499; ++i) {
+    for (let i = 0; i <= 39; ++i) {
         const distributorName = faker.company.name();
-        const cityId = faker.helpers.arrayElement(newCities).id;
-        const stateId = faker.helpers.arrayElement(newStates).id;
+        const state = faker.helpers.arrayElement(usState)
+
 
 
         const distributor = await prisma.distributor.create({
@@ -513,25 +465,18 @@ async function main() {
                 phone: faker.phone.number(),
                 email: faker.internet.email(),
                 website: `${distributorName.toLowerCase().replace(/ /g, '-')}.com`,
-                address: faker.address.streetAddress(true),
-                city: {
-                    connect: {
-                        id: cityId
+                address: {
+                    create: {
+                        address1: faker.address.streetAddress(),
+                        address2: faker.address.secondaryAddress(),
+                        city: faker.address.city(),
+                        state: state,
+                        country: 'USA',
+                        zip: faker.address.zipCodeByState(state),
+                        latitude: parseFloat(faker.address.latitude()),
+                        longitude: parseFloat(faker.address.longitude())
                     }
                 },
-                state: {
-                    connect: {
-                        id: stateId
-                    }
-                },
-                country: {
-                    connect: {
-                        id: country.id
-                    }
-                },
-                zip: faker.address.zipCodeByState(stateId.code),
-                lat: faker.address.latitude(),
-                lon: faker.address.longitude(),
                 images: {
                     create: [{
                         fileName: faker.system.commonFileName(),
@@ -557,7 +502,7 @@ async function main() {
     }
 
     // FoodOrder data: 
-    for (let i = 0; i <= 1999; ++i) {
+    for (let i = 0; i <= 199; ++i) {
         const distributor = faker.helpers.arrayElement(newDistributors);
 
         const foodOrder = await prisma.foodOrder.create({
@@ -583,7 +528,7 @@ async function main() {
     }
 
     // FoodOrderItem data: 
-    for (let i = 0; i <= 4999; ++i) {
+    for (let i = 0; i <= 299; ++i) {
         const foodOrderItem = await prisma.foodOrderItem.create({
             data: {
                 productName: faker.commerce.productName(),

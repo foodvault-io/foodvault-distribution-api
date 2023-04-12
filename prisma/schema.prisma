@@ -90,20 +90,7 @@ model RestaurantDetails {
   image String? @db.VarChar(500)
 
   // Location Data
-  address String @db.VarChar(500)
-
-  cityId String
-  city City @relation(fields: [cityId], references: [id])
-
-  stateId String
-  state State @relation(fields: [stateId], references: [id])
-
-  countryId String
-  country Country @relation(fields: [countryId], references: [id])
-
-  zip String
-  lat String?
-  lon String?
+  address RestaurantAddress[]
 
   // Restaurant Media
   images Media[]
@@ -247,20 +234,7 @@ model Distributor {
   website String? @db.VarChar(250)
   
   // Location Data
-  address String @db.VarChar(250)
-
-  cityId String
-  city City @relation(fields: [cityId], references: [id])
-
-  stateId String
-  state State @relation(fields: [stateId], references: [id])
-
-  countryId String
-  country Country @relation(fields: [countryId], references: [id])
-
-  zip String
-  lat String?
-  lon String?
+  address DistributorAddress[]
 
   // Distributor Media
   images Media[]
@@ -271,49 +245,40 @@ model Distributor {
   @@map("distributor")
 }
 
-// Location Models: Cities, States, Countries
-model City {
-  id String @id @default(uuid())
-  name String
+model RestaurantAddress {
+  id        Int      @id @default(autoincrement())
+  restaurantId  String    @unique
+  address1  String @db.VarChar(350)
+  address2  String?
+  city      String @db.VarChar(50)
+  state     String @db.VarChar(4)
+  country   String 
+  zip       String @db.VarChar(10)
+  latitude  Float?
+  longitude Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  restaurant   RestaurantDetails  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
-  stateId String
-  state State @relation(fields: [stateId], references: [id], onDelete: Cascade)
-
-  restaurantDetails RestaurantDetails[]
-  distributor Distributor[]
-
-  @@unique([name, stateId])
-  @@map("city")
+  @@map("restaurantAddress")
 }
 
-model State {
-  id String @id @default(uuid())
-  name String
-  code String
+model DistributorAddress {
+  id        Int      @id @default(autoincrement())
+  distributorId  String    @unique
+  address1  String @db.VarChar(350)
+  address2  String? 
+  city      String @db.VarChar(50)
+  state     String @db.VarChar(4)
+  country   String 
+  zip       String @db.VarChar(10)
+  latitude  Float?
+  longitude Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  restaurant   Distributor  @relation(fields: [distributorId], references: [id], onDelete: Cascade)
 
-  city City[]
-
-  countryId String
-  country Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
-
-  restaurantDetails RestaurantDetails[]
-  distributor Distributor[]
-
-  @@unique([code, countryId])
-  @@map("state")
-}
-
-model Country {
-  id String @id @default(uuid())
-  name String @unique
-  code String
-
-  state State[]
-
-  restaurantDetails RestaurantDetails[]
-  distributor Distributor[]
-
-  @@map("country")
+  @@map("distributorAddress")
 }
 
 // Media Models

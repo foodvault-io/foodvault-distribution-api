@@ -92,7 +92,7 @@ export class AuthService {
         const existingUser = await this.findOneByEmail(oAuthUser.email);
 
         if (!existingUser) {
-            const secureProviderId = await argon2.hash(oAuthUser.providerId);
+            const secureProviderId = await argon2.hash(oAuthUser.providerAccountId);
 
             const newUser = await this.createUser({
                 email: oAuthUser.email,
@@ -125,7 +125,7 @@ export class AuthService {
                     userId: newUser.id,
                     providerType: 'oauth2',
                     provider: oAuthUser.provider,
-                    providerAccountId: oAuthUser.providerId,
+                    providerAccountId: oAuthUser.providerAccountId,
                     accessToken: tokens.accessToken,
                     accessTokenExpires: 60 * 15,
                     tokenType: 'Bearer',
@@ -146,7 +146,7 @@ export class AuthService {
                 throw new BadRequestException('Invalid Provider Account');
             } else if (account.provider !== oAuthUser.provider) {
                 throw new BadRequestException(`Previously signed up with ${account.provider}`);
-            } else if (account.providerAccountId === oAuthUser.providerId) {
+            } else if (account.providerAccountId === oAuthUser.providerAccountId) {
                 const tokens = await this.getTokens(existingUser.id, existingUser.email, existingUser.role);
                 await this.updateRefreshTokenHashLocal(existingUser.id, tokens.refreshToken);
                 return tokens;
