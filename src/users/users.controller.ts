@@ -2,7 +2,7 @@ import { Controller, Get, Body, Patch, Param, Delete, UseGuards, Logger } from '
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetCurrentUserId, Public } from '../common/decorators';
-import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from 'nest-access-control';
+import { ACGuard, UseRoles } from 'nest-access-control';
 
 @Controller({
   path: 'users',
@@ -13,7 +13,6 @@ export class UsersController {
 
   constructor(
     private readonly usersService: UsersService,
-    @InjectRolesBuilder() private readonly roleBuilder: RolesBuilder,
   ) { }
 
   

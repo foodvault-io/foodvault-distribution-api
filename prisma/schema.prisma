@@ -105,6 +105,7 @@ model RestaurantDetails {
   // Food Order List
   foodOrders FoodOrder[]
 
+  @@unique([name, ownerId])
   @@map("restaurantDetails")
 }
 

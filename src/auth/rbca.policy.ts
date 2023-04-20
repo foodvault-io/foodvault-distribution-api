@@ -13,7 +13,7 @@ RBAC_POLICY
         .createOwn('restaurant')
         .updateOwn('restaurant')
         .deleteOwn('restaurant')
-        .read('restaurant')
+        .readOwn('restaurant')
     .grant(RoleEnum.ADMIN)
         .extend(RoleEnum.RESTAURANT)
         .create('user')
