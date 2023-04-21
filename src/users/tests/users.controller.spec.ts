@@ -69,6 +69,7 @@ describe('UsersController', () => {
 
   afterEach(async () => {
     await prisma.cleanDb(); // Clean up the database
+    await prisma.$disconnect(); // Disconnect from the database
   });
 
   it('should be defined', () => {
@@ -130,6 +131,30 @@ describe('UsersController', () => {
       }
     });
   });
+
+  describe('getMyself()', () => {
+    const createTestUser: CreateUserDto = {
+      email: 'thor1234@odinson.com',
+      firstName: 'Thor',
+      lastName: 'Odinson',
+      password: 'password',
+    };
+
+    it('should return the logged in user', async () => {
+      const testUser = await service.createUser(createTestUser);
+
+      const result = await controller.getMyself(testUser.id);
+      expect(result.id).toEqual(testUser.id);
+      expect(result.createdAt).toEqual(testUser.createdAt);
+      expect(result.updatedAt).toEqual(testUser.updatedAt);
+      expect(result.email).toEqual(testUser.email);
+      expect(result.firstName).toEqual(testUser.firstName);
+      expect(result.lastName).toEqual(testUser.lastName);
+      expect(result.role).toEqual(testUser.role);
+      expect(result.hashedPassword).toBeUndefined();
+      expect(result.image).toBeNull();
+    });
+  })
 
   describe('findOneByEmail()', () => {
     const adminUser: User = {

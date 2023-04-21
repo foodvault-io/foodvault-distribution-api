@@ -2,7 +2,7 @@ import { Controller, Get, Body, Patch, Param, Delete, UseGuards, Logger } from '
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetCurrentUserId, Public } from '../common/decorators';
-import { ACGuard, InjectRolesBuilder, RolesBuilder, UseRoles } from 'nest-access-control';
+import { ACGuard, UseRoles } from 'nest-access-control';
 
 @Controller({
   path: 'users',
@@ -13,15 +13,14 @@ export class UsersController {
 
   constructor(
     private readonly usersService: UsersService,
-    @InjectRolesBuilder() private readonly roleBuilder: RolesBuilder,
   ) { }
 
   
   @Get()
   @Public()
-  findAll() {
+  async findAll() {
     this.loggin.debug('All Users');
-    return this.usersService.findAll();
+    return await this.usersService.findAll();
   }
 
   @Get(':id')
@@ -45,7 +44,7 @@ export class UsersController {
     action: 'read',
     possession: 'own',
   })
-  async username(
+  async getMyself(
     @GetCurrentUserId() id: string,
   ) {
     this.loggin.debug('LoggedIn User by id: ' + id);

@@ -1,34 +1,113 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { 
+  Controller,
+  Get, 
+  Post, 
+  Body, 
+  Patch, 
+  Param, 
+  Delete, 
+  Logger, 
+  UseGuards,
+  HttpCode,
+  HttpStatus, 
+} from '@nestjs/common';
 import { RestaurantsService } from './restaurants.service';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { ACGuard, UseRoles } from 'nest-access-control';
+import { Public, GetCurrentUserId } from '../common/decorators';
 
-@Controller('restaurants')
+@Controller({
+  path: 'restaurants',
+  version: '1',
+})
 export class RestaurantsController {
+  loggin: Logger = new Logger('RestaurantsController');
+
   constructor(private readonly restaurantsService: RestaurantsService) {}
 
   @Post()
-  create(@Body() createRestaurantDto: CreateRestaurantDto) {
-    return this.restaurantsService.create(createRestaurantDto);
+  @UseGuards(ACGuard)
+  @UseRoles({
+    resource: 'restaurant',
+    action: 'create',
+    possession: 'own',
+  })
+  async createRestaurant(
+    @GetCurrentUserId() ownerId: string,
+    @Body() createRestaurantDto: CreateRestaurantDto
+  ) {
+    this.loggin.debug('Restaurant created by: ' + ownerId);
+    return await this.restaurantsService.createRestaurant(ownerId, createRestaurantDto);
   }
 
   @Get()
-  findAll() {
-    return this.restaurantsService.findAll();
+  @Public()
+  async findAll() {
+    this.loggin.debug('All Restaurants');
+    return await this.restaurantsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.restaurantsService.findOne(+id);
+  @UseGuards(ACGuard)
+  @UseRoles({
+    resource: 'restaurant',
+    action: 'read',
+    possession: 'any',
+  })
+  async findOneByRestaurantId(@Param('id') restaurantId: string) {
+    this.loggin.debug('Restaurant by id: ' + restaurantId);
+    return await this.restaurantsService.findOneByRestaurantId(restaurantId);
+  }
+
+  @Get('/own/:id')
+  @UseGuards(ACGuard)
+  @UseRoles({
+    resource: 'restaurant',
+    action: 'read',
+    possession: 'own',
+  })
+  async findOneByRestaurantIdOwner(@Param('id') restaurantId: string) {
+    this.loggin.debug('Owner Looked up Restaurant: ' + restaurantId);
+    return await this.restaurantsService.findOneByRestaurantId(restaurantId);
+  }
+
+  @Get('/owner/many')
+  @UseGuards(ACGuard)
+  @UseRoles({
+    resource: 'restaurant',
+    action: 'read',
+    possession: 'own',
+  })
+  async findManyByOwnerId(
+    @GetCurrentUserId() ownerId: string,
+  ) {
+    this.loggin.debug('Restaurants by owner id: ' + ownerId);
+    return await this.restaurantsService.findManyByOwnerId(ownerId);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRestaurantDto: UpdateRestaurantDto) {
-    return this.restaurantsService.update(+id, updateRestaurantDto);
+  @UseGuards(ACGuard)
+  @UseRoles({
+    resource: 'restaurant',
+    action: 'update',
+    possession: 'own',
+  })
+  async update(@Param('id') restaurantId: string, @Body() updateRestaurantDto: UpdateRestaurantDto) {
+    this.loggin.debug('Restaurant Updated: ' + restaurantId)
+    return await this.restaurantsService.updateRestaurant(restaurantId, updateRestaurantDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.restaurantsService.remove(+id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(ACGuard)
+  @UseRoles({
+    resource: 'restaurant',
+    action: 'delete',
+    possession: 'own',
+  })
+  async remove(@Param('id') restaurantId: string) {
+    this.loggin.debug('Restaurant Deleted: ' + restaurantId)
+    return await this.restaurantsService.removeRestaurant(restaurantId);
   }
 }
