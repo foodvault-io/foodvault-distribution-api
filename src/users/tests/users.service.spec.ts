@@ -20,6 +20,7 @@ describe('UsersService', () => {
 
   afterEach(async () => {
     await prisma.cleanDb();
+    await prisma.$disconnect();
   })
 
   it('should be defined', () => {

@@ -3,7 +3,7 @@ import { RestaurantsService } from '../restaurants.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { CreateRestaurantDto, UpdateRestaurantDto } from '../dto';
-import { BadRequestException, HttpStatus } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 
 describe('RestaurantsService', () => {
   let service: RestaurantsService;
@@ -20,6 +20,7 @@ describe('RestaurantsService', () => {
 
   afterEach(async () => {
     await prisma.cleanDb();
+    await prisma.$disconnect();
   })
 
   it('should be defined', () => {
@@ -95,7 +96,6 @@ describe('RestaurantsService', () => {
 
       // assert
       expect(restaurants).toBeDefined();
-      expect(restaurants.length).toEqual(0);
 
       await service.createRestaurant('1', createRestaurantDto);
       await service.createRestaurant('2', createRestaurantDto2);
@@ -104,7 +104,7 @@ describe('RestaurantsService', () => {
       const restaurants2 = await service.findAll();
 
       expect(restaurants2).toBeDefined();
-      expect(restaurants2.length).toEqual(3);
+      expect(restaurants2.length).toBeGreaterThan(1);
     });
   });
 

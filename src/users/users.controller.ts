@@ -18,9 +18,9 @@ export class UsersController {
   
   @Get()
   @Public()
-  findAll() {
+  async findAll() {
     this.loggin.debug('All Users');
-    return this.usersService.findAll();
+    return await this.usersService.findAll();
   }
 
   @Get(':id')
@@ -44,7 +44,7 @@ export class UsersController {
     action: 'read',
     possession: 'own',
   })
-  async username(
+  async getMyself(
     @GetCurrentUserId() id: string,
   ) {
     this.loggin.debug('LoggedIn User by id: ' + id);
