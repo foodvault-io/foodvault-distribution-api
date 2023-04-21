@@ -37,10 +37,10 @@ export class RestaurantsService {
     return await this.prisma.restaurantDetails.findMany();
   }
 
-  async findOneByRestaurantId(id: string): Promise<RestaurantDetails | undefined> {
+  async findOneByRestaurantId(restaurantId: string): Promise<RestaurantDetails | undefined> {
     const restaurant = await this.prisma.restaurantDetails.findFirst({
       where: {
-        id: id
+        id: restaurantId
       },
     });
 
@@ -51,14 +51,14 @@ export class RestaurantsService {
     return restaurant;
   }
 
-  async findManyByOwnerId(id: string): Promise<RestaurantDetails[] | undefined> {
+  async findManyByOwnerId(ownerId: string): Promise<RestaurantDetails[] | undefined> {
     const restaurant = await this.prisma.restaurantDetails.findMany({
       where: {
-        ownerId: id
+        ownerId: ownerId
       },
     });
 
-    if (!restaurant) {
+    if (restaurant.length === 0 || !Array.isArray(restaurant)) {
       throw new NotFoundException('Restaurant not Found');
     }
 
@@ -66,10 +66,10 @@ export class RestaurantsService {
   }
 
 
-  async updateRestaurant(id: string, updateRestaurantDto: UpdateRestaurantDto): Promise<Partial<RestaurantDetails>> {
+  async updateRestaurant(restaurantId: string, updateRestaurantDto: UpdateRestaurantDto): Promise<Partial<RestaurantDetails>> {
     const restaurant = await this.prisma.restaurantDetails.findUnique({
       where: {
-        id: id
+        id: restaurantId
       }
     })
 
@@ -79,7 +79,7 @@ export class RestaurantsService {
 
     const updatedRestaurant = await this.prisma.restaurantDetails.update({
       where: {
-        id: id
+        id: restaurant.id
       },
       data: {
         status: updateRestaurantDto.status? updateRestaurantDto.status : restaurant.status,
@@ -94,11 +94,11 @@ export class RestaurantsService {
     return updatedRestaurant;
   }
 
-  async removeRestaurant(id: string) {
+  async removeRestaurant(restaurantId: string) {
     try {
       const restaurant = await this.prisma.restaurantDetails.findUnique({
         where: {
-          id: id
+          id: restaurantId
         }
       })
 

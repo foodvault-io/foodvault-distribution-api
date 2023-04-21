@@ -55,9 +55,9 @@ export class RestaurantsController {
     action: 'read',
     possession: 'any',
   })
-  async findOneByRestaurantId(@Param('id') id: string) {
-    this.loggin.debug('Restaurant by id: ' + id);
-    return await this.restaurantsService.findOneByRestaurantId(id);
+  async findOneByRestaurantId(@Param('id') restaurantId: string) {
+    this.loggin.debug('Restaurant by id: ' + restaurantId);
+    return await this.restaurantsService.findOneByRestaurantId(restaurantId);
   }
 
   @Get('/own/:id')
@@ -67,9 +67,9 @@ export class RestaurantsController {
     action: 'read',
     possession: 'own',
   })
-  async findOneByRestaurantIdOwner(@Param('id') id: string) {
-    this.loggin.debug('Owner Looked up Restaurant: ' + id);
-    return await this.restaurantsService.findOneByRestaurantId(id);
+  async findOneByRestaurantIdOwner(@Param('id') restaurantId: string) {
+    this.loggin.debug('Owner Looked up Restaurant: ' + restaurantId);
+    return await this.restaurantsService.findOneByRestaurantId(restaurantId);
   }
 
   @Get('/owner/many')
