@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { AccessControlModule } from 'nest-access-control';
 import { RBAC_POLICY } from './auth/rbca.policy';
+import { RestaurantOrdersModule } from './restaurant-orders/restaurant-orders.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { RBAC_POLICY } from './auth/rbca.policy';
     AuthModule,
     UsersModule,
     RestaurantsModule,
+    RestaurantOrdersModule,
+    ProductsModule,
   ],
   controllers: [],
   providers: [],
