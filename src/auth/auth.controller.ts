@@ -31,7 +31,7 @@ import {
     version: '1',
 })
 export class AuthController {
-    loggin: Logger = new Logger('AuthController');
+    log: Logger = new Logger('AuthController');
 
     constructor(
         private readonly authService: AuthService,
@@ -41,7 +41,7 @@ export class AuthController {
     @Public()
     @Post('/local/signup')
     async signUpLocally(@Body() signUpDto: LocalAuthDto): Promise<Tokens> {
-        this.loggin.debug('New User SignUp')
+        this.log.debug('New User SignUp')
         return await this.authService.signUpLocally(signUpDto);
     }
 
@@ -50,7 +50,7 @@ export class AuthController {
     @UseGuards(LocalAuthGuard)
     @Post('/local/login')
     signInLocally(@UserFromOAuth() tokens: Tokens) {
-        this.loggin.debug('User Local Login')
+        this.log.debug('User Local Login')
         return tokens;
     }
 
@@ -59,14 +59,14 @@ export class AuthController {
     @UseGuards(GoogleAuthGuard)
     @Get('/google')
     async googleAuth() { 
-        this.loggin.log('Google Auth Route Initiated')
+        this.log.log('Google Auth Route Initiated')
     }
 
     @Public()
     @UseGuards(GoogleAuthGuard)
     @Get('/google/callback')
     async googleAuthCallback(@UserFromOAuth() user: OAuthUser) {
-        this.loggin.debug('Google Auth Callback Route Initiated')
+        this.log.debug('Google Auth Callback Route Initiated')
         return await this.authService.socialLogin(user);
     }
 
@@ -75,7 +75,7 @@ export class AuthController {
     @UseGuards(FacebookAuthGuard)
     @Get('/facebook')
     async facebookAuth() {
-        this.loggin.log('Facebook Auth Route Initiated')
+        this.log.log('Facebook Auth Route Initiated')
     }
 
     @Public()
@@ -84,7 +84,7 @@ export class AuthController {
     async facebookAuthCallback(
         @UserFromOAuth() user: OAuthUser,
     ) {
-        this.loggin.debug('Facebook Auth Callback Route Initiated')
+        this.log.debug('Facebook Auth Callback Route Initiated')
         return await this.authService.socialLogin(user);
     }
 
@@ -93,7 +93,7 @@ export class AuthController {
     @UseGuards(LinkedInAuthGuard)
     @Get('/linkedin')
     async linkedInAuth() {
-        this.loggin.log('LinkedIn Auth Route Initiated')
+        this.log.log('LinkedIn Auth Route Initiated')
     }
 
     @Public()
@@ -102,7 +102,7 @@ export class AuthController {
     async linkedInAuthCallback(
         @UserFromOAuth() user: OAuthUser,
     ) {
-        this.loggin.debug('LinkedIn Auth Callback Route Initiated')
+        this.log.debug('LinkedIn Auth Callback Route Initiated')
         return await this.authService.socialLogin(user);
     }
 
@@ -110,7 +110,7 @@ export class AuthController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @Post('logout')
     logout(@GetCurrentUserId() userId: string) {
-        this.loggin.debug('User Logout')
+        this.log.debug('User Logout')
         return this.authService.localLogout(userId);
     }
 
@@ -122,7 +122,7 @@ export class AuthController {
         @GetCurrentUserId() userId: string,
         @GetCurrentUser('refreshToken') refreshToken: string
     ) {
-        this.loggin.debug('Refresh Token')
+        this.log.debug('Refresh Token')
         return this.authService.refreshToken(userId, refreshToken)
     }
 }

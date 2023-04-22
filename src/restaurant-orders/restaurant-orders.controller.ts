@@ -1,18 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, UseGuards } from '@nestjs/common';
 import { RestaurantOrdersService } from './restaurant-orders.service';
 import { 
   CreateRestaurantOrderDto,
   UpdateRestaurantOrderDto,
   CreateOrderItemDto,
-  CreateProductDto 
 } from './dto';
+import { ACGuard, UseRoles } from 'nest-access-control';
 
 @Controller({
   path: 'restaurant-orders',
   version: '1',
 })
 export class RestaurantOrdersController {
-  loggin: Logger = new Logger('RestaurantOrdersController');
+  log: Logger = new Logger('RestaurantOrdersController');
 
   constructor(private readonly restaurantOrdersService: RestaurantOrdersService) {}
 
@@ -20,7 +20,7 @@ export class RestaurantOrdersController {
   async createOrder(
     @Body() createRestaurantOrderDto: CreateRestaurantOrderDto,
   ) {
-    this.loggin.debug('Restaurant Order created for restaurant: ' + createRestaurantOrderDto.restaurantId)
+    this.log.debug('Restaurant Order created for restaurant: ' + createRestaurantOrderDto.restaurantId)
 
     return await this.restaurantOrdersService.createOrder(
       createRestaurantOrderDto,
@@ -32,7 +32,7 @@ export class RestaurantOrdersController {
     @Param('orderId') orderId: string,
     @Body() createOrderItemDto: CreateOrderItemDto,
   ) {
-    this.loggin.debug('Order Item created for order: ' + orderId)
+    this.log.debug('Order Item created for order: ' + orderId)
     return await this.restaurantOrdersService.createOrderItem(
       orderId,
       createOrderItemDto,
@@ -40,13 +40,35 @@ export class RestaurantOrdersController {
   }
 
   @Get()
-  findAll() {
-    return this.restaurantOrdersService.findAll();
+  @UseGuards(ACGuard)
+  @UseRoles({
+    resource: 'restaurant-orders',
+    action: 'read',
+    possession: 'any',
+  })
+  async findRestaurantOrders() {
+    this.log.debug('Restaurant Orders found')
+    return await this.restaurantOrdersService.findRestaurantOrders();
+  }
+
+  @Get('/restaurant/:restaurantId')
+  @UseGuards(ACGuard)
+  @UseRoles({
+    resource: 'restaurant-orders',
+    action: 'read',
+    possession: 'own',
+  })
+  async findMyRestaurantOrders(
+    @Param('restaurantId') restaurantId: string,
+  ) {
+    this.log.debug('Restaurant Orders found for restaurant: ' + restaurantId)
+    return await this.restaurantOrdersService.findMyRestaurantOrders(restaurantId)
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.restaurantOrdersService.findOne(+id);
+  findOne(@Param('id') orderId: string) {
+    this.log.debug('Restaurant Order found: ' + orderId)
+    return this.restaurantOrdersService.findOneByOwner(orderId);
   }
 
   @Patch(':id')

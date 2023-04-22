@@ -22,7 +22,7 @@ import { Public, GetCurrentUserId } from '../common/decorators';
   version: '1',
 })
 export class RestaurantsController {
-  loggin: Logger = new Logger('RestaurantsController');
+  log: Logger = new Logger('RestaurantsController');
 
   constructor(private readonly restaurantsService: RestaurantsService) {}
 
@@ -37,14 +37,14 @@ export class RestaurantsController {
     @GetCurrentUserId() ownerId: string,
     @Body() createRestaurantDto: CreateRestaurantDto
   ) {
-    this.loggin.debug('Restaurant created by: ' + ownerId);
+    this.log.debug('Restaurant created by: ' + ownerId);
     return await this.restaurantsService.createRestaurant(ownerId, createRestaurantDto);
   }
 
   @Get()
   @Public()
   async findAll() {
-    this.loggin.debug('All Restaurants');
+    this.log.debug('All Restaurants');
     return await this.restaurantsService.findAll();
   }
 
@@ -56,7 +56,7 @@ export class RestaurantsController {
     possession: 'any',
   })
   async findOneByRestaurantId(@Param('id') restaurantId: string) {
-    this.loggin.debug('Restaurant by id: ' + restaurantId);
+    this.log.debug('Restaurant by id: ' + restaurantId);
     return await this.restaurantsService.findOneByRestaurantId(restaurantId);
   }
 
@@ -68,7 +68,7 @@ export class RestaurantsController {
     possession: 'own',
   })
   async findOneByRestaurantIdOwner(@Param('id') restaurantId: string) {
-    this.loggin.debug('Owner Looked up Restaurant: ' + restaurantId);
+    this.log.debug('Owner Looked up Restaurant: ' + restaurantId);
     return await this.restaurantsService.findOneByRestaurantId(restaurantId);
   }
 
@@ -82,7 +82,7 @@ export class RestaurantsController {
   async findManyByOwnerId(
     @GetCurrentUserId() ownerId: string,
   ) {
-    this.loggin.debug('Restaurants by owner id: ' + ownerId);
+    this.log.debug('Restaurants by owner id: ' + ownerId);
     return await this.restaurantsService.findManyByOwnerId(ownerId);
   }
 
@@ -94,7 +94,7 @@ export class RestaurantsController {
     possession: 'own',
   })
   async update(@Param('id') restaurantId: string, @Body() updateRestaurantDto: UpdateRestaurantDto) {
-    this.loggin.debug('Restaurant Updated: ' + restaurantId)
+    this.log.debug('Restaurant Updated: ' + restaurantId)
     return await this.restaurantsService.updateRestaurant(restaurantId, updateRestaurantDto);
   }
 
@@ -107,7 +107,7 @@ export class RestaurantsController {
     possession: 'own',
   })
   async remove(@Param('id') restaurantId: string) {
-    this.loggin.debug('Restaurant Deleted: ' + restaurantId)
+    this.log.debug('Restaurant Deleted: ' + restaurantId)
     return await this.restaurantsService.removeRestaurant(restaurantId);
   }
 }

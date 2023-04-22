@@ -13,7 +13,7 @@ export async function createRandomUser() {
         lastName: lastName,
         hashedPassword: await argon.hash('password'),
         image: faker.image.avatar(),
-        role: faker.helpers.arrayElement([RoleEnum.USER, RoleEnum.RESTAURANT ]),
+        role: faker.helpers.arrayElement([RoleEnum.USER, RoleEnum.RESTAURANT]),
     };
 }
 
@@ -320,7 +320,7 @@ async function main() {
 
         newMedia.push(media);
     }
-    
+
     // Create Restaurant Details Data: 
     for (let i = 0; i <= 99; ++i) {
         const state = faker.helpers.arrayElement(usState)
@@ -348,7 +348,7 @@ async function main() {
                     connect: {
                         id: faker.helpers.arrayElement(newMedia).id
                     }
-                }, 
+                },
                 ownerUser: {
                     connect: {
                         id: faker.helpers.arrayElement(newUsers).id,
@@ -370,7 +370,7 @@ async function main() {
                     }
                 }
             }
-        }); 
+        });
 
         newOrders.push(restaurantOrder);
     }

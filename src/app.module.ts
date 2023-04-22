@@ -7,6 +7,7 @@ import { AccessControlModule } from 'nest-access-control';
 import { RBAC_POLICY } from './auth/rbca.policy';
 import { RestaurantOrdersModule } from './restaurant-orders/restaurant-orders.module';
 import { ProductsModule } from './products/products.module';
+import { MediasModule } from './medias/medias.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ProductsModule } from './products/products.module';
     RestaurantsModule,
     RestaurantOrdersModule,
     ProductsModule,
+    MediasModule,
   ],
   controllers: [],
   providers: [],

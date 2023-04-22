@@ -9,7 +9,7 @@ import { ACGuard, UseRoles } from 'nest-access-control';
   version: '1',
 })
 export class UsersController {
-  loggin: Logger = new Logger('UsersController');
+  log: Logger = new Logger('UsersController');
 
   constructor(
     private readonly usersService: UsersService,
@@ -19,7 +19,7 @@ export class UsersController {
   @Get()
   @Public()
   async findAll() {
-    this.loggin.debug('All Users');
+    this.log.debug('All Users');
     return await this.usersService.findAll();
   }
 
@@ -33,7 +33,7 @@ export class UsersController {
   async findOneById(
     @Param('id') id: string,
   ) {
-    this.loggin.debug('User by id: ' + id);
+    this.log.debug('User by id: ' + id);
     return await this.usersService.findOneById(id);
   }
 
@@ -47,7 +47,7 @@ export class UsersController {
   async getMyself(
     @GetCurrentUserId() id: string,
   ) {
-    this.loggin.debug('LoggedIn User by id: ' + id);
+    this.log.debug('LoggedIn User by id: ' + id);
     return await this.usersService.findOneById(id);
   }
 
@@ -61,7 +61,7 @@ export class UsersController {
   async findOneByEmail(
     @Param('email') email: string,
   ) {
-    this.loggin.debug('User by email: ' + email);
+    this.log.debug('User by email: ' + email);
     return await this.usersService.findOneByEmail(email);
   }
 

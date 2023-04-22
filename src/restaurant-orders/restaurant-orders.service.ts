@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { 
   CreateOrderItemDto,
-  CreateProductDto,
   CreateRestaurantOrderDto, 
   UpdateRestaurantOrderDto 
 } from './dto';
@@ -60,12 +59,64 @@ export class RestaurantOrdersService {
     }
   }
 
-  findAll() {
-    return `This action returns all restaurantOrders`;
+  async findRestaurantOrders() {
+    const orders = await this.prisma.restaurantOrder.findMany({
+      include: {
+        orderItems: true,
+      }
+    });
+
+    if (orders.length === 0) {
+      return {
+        message: 'No orders found',
+      }
+    }
+    
+    return orders;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} restaurantOrder`;
+  async findMyRestaurantOrders(restaurantId: string) {
+    const myOrders = await this.prisma.restaurantOrder.findMany({
+      where: {
+        restaurantId: restaurantId,
+      },
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          }
+        }
+      }
+    })
+
+    if (myOrders.length === 0) {
+      return {
+        message: 'No orders found for restaurant: ' + restaurantId,
+      }
+    }
+
+    return myOrders;
+  }
+
+  async findOneByOwner(orderId: string) {
+    const order = await this.prisma.restaurantOrder.findUnique({
+      where: {
+        id: orderId,
+      },
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          }
+        }
+      }
+    });
+
+    if (!order) {
+      return new NotFoundException('Order not found');
+    }
+
+    return order;
   }
 
   update(id: number, updateRestaurantOrderDto: UpdateRestaurantOrderDto) {
