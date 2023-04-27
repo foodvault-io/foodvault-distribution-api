@@ -8,6 +8,7 @@ import { RBAC_POLICY } from './auth/rbca.policy';
 import { RestaurantOrdersModule } from './restaurant-orders/restaurant-orders.module';
 import { ProductsModule } from './products/products.module';
 import { MediasModule } from './medias/medias.module';
+import { DistributorOrdersModule } from './distributor-orders/distributor-orders.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MediasModule } from './medias/medias.module';
     RestaurantOrdersModule,
     ProductsModule,
     MediasModule,
+    DistributorOrdersModule,
   ],
   controllers: [],
   providers: [],

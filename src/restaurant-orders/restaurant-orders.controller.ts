@@ -66,7 +66,13 @@ export class RestaurantOrdersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') orderId: string) {
+  @UseGuards(ACGuard)
+  @UseRoles({
+    resource: 'restaurant-orders',
+    action: 'read',
+    possession: 'own',
+  })
+  async findOneByOwner(@Param('id') orderId: string) {
     this.log.debug('Restaurant Order found: ' + orderId)
     return this.restaurantOrdersService.findOneByOwner(orderId);
   }

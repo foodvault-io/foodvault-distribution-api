@@ -17,45 +17,59 @@ export class RestaurantOrdersService {
   async createOrder(
     restaurantOrderDto: CreateRestaurantOrderDto,
   ) {
-    const order = await this.prisma.restaurantOrder.create({
-      data: {
-        restaurantId: restaurantOrderDto.restaurantId,
-      }
-    });
+    try {
+      const order = await this.prisma.restaurantOrder.create({
+        data: {
+          restaurantId: restaurantOrderDto.restaurantId,
+        }
+      });
 
-    return {
-      orderId: order.id,
-    };
+      return {
+        orderId: order.id,
+      };
+    } catch (error) {
+      if( error.code === 'P2002') {
+        throw new NotFoundException('Order already exists');
+      }
+      throw error;
+    }
   }
 
   async createOrderItem(
     orderId: string,
     orderItemDto: CreateOrderItemDto,
   ) {
-    const orderItem = await this.prisma.orderItem.create({
-      data: {
-        quantity: orderItemDto.quantity,
-        productId: orderItemDto.productId,
-        orderPlacedId: orderId
-      }
-    });
+    try {
+      const orderItem = await this.prisma.orderItem.create({
+        data: {
+          quantity: orderItemDto.quantity,
+          productId: orderItemDto.productId,
+          orderPlacedId: orderId
+        }
+      });
 
-    const updatedOrder = await this.prisma.restaurantOrder.update({
-      where: {
-        id: orderId,
-      },
-      data: {
-        orderItems: {
-          connect: {
-            id: orderItem.id,
+      const updatedOrder = await this.prisma.restaurantOrder.update({
+        where: {
+          id: orderId,
+        },
+        data: {
+          orderItems: {
+            connect: {
+              id: orderItem.id,
+            }
           }
         }
-      }
-    });
+      });
 
-    return {
-      orderId: updatedOrder.id,
-      orderItemId: orderItem.id,
+      return {
+        orderId: updatedOrder.id,
+        orderItemId: orderItem.id,
+      }
+    } catch (error) {
+      if( error.code === 'P2002') {
+        throw new NotFoundException('Order Item already exists');
+      }
+      throw error;
     }
   }
 
